@@ -26,7 +26,11 @@ namespace ImageHandler.Utils
             return integralImage[x, y];
         }
 
-        // Проверяет, что точка лежит внутри изображения
+        /// <summary>
+        /// Проверяет, что точка лежит внутри изображения
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
         private bool IsInside(Point p)
         {
             bool xInside = 0 < p.X && p.X < Width;
@@ -35,7 +39,11 @@ namespace ImageHandler.Utils
             return xInside && yInside;
         }
 
-        // Преобразует изображение оттенков серого в интегральное
+        /// <summary>
+        /// Преобразует изображение оттенков серого в интегральное
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
         public static int[,] TransformToIntegral(GreyImage image)
         {
             int[,] result = new int[image.Width, image.Height];
@@ -47,7 +55,7 @@ namespace ImageHandler.Utils
                     int leftSum = i != 0 ? result[i - 1, j] : 0;
                     int topSum = j != 0 ? result[i, j - 1] : 0;
 
-                    result[i, j] = (int)image.GetValue(i, j) + leftSum + topSum - digonalSum;
+                    result[i, j] = image.GetValue(i, j) + leftSum + topSum - digonalSum;
                 }
 
             return result;

@@ -8,7 +8,9 @@ using System.Drawing.Imaging;
 
 namespace ImageHandler.Utils
 {
-    // представляет собой пиксель, с возможностью менять значение компонент
+    /// <summary>
+    /// Пиксель, с возможностью менять значение компонент
+    /// </summary>
     public class Pixel
     {
         public byte R { get; set; }
@@ -28,7 +30,9 @@ namespace ImageHandler.Utils
         }
     }
 
-    // Класс предоставляющий доступ к пикселам.
+    /// <summary>
+    /// Класс предоставляющий доступ к пикселам.
+    /// </summary>
     public class ImagePixels: IDisposable
     {
         public static PixelFormat pixelformat = PixelFormat.Format24bppRgb;
@@ -66,7 +70,10 @@ namespace ImageHandler.Utils
             }
         }
 
-        // Достает данные о пикселах в массиве байтов и преобразует их в двумерный масив
+        /// <summary>
+        /// Достает данные о пикселах в массиве байтов и преобразует их в двумерный масив
+        /// </summary>
+        /// <returns>двумерный массив пикселей</returns>
         private Pixel[,] InitPixelMatrix()
         {
             unsafe
@@ -95,7 +102,10 @@ namespace ImageHandler.Utils
             return pixelMatrix;
         }
 
-        //Сохраняет изменения и разблокирует пиксели
+        /// <summary>
+        /// Сохраняет изменения и разблокирует пиксели
+        /// </summary>
+        /// <returns></returns>
         private Pixel[,] SaveAndUnlockPixelsParallel()
         {
             unsafe

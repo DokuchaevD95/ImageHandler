@@ -22,6 +22,10 @@ namespace ImageHandler.Forms
         public StartForm()
         {
             InitializeComponent();
+
+            var t = FeaturesTemplates.Templates;
+            var f = new HaarFeature(t[0]);
+            var a = 1;
         }
 
         private void downloadFileButtton_Click(object sender, EventArgs e)
