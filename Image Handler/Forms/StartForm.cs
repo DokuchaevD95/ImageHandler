@@ -23,8 +23,8 @@ namespace ImageHandler.Forms
         {
             InitializeComponent();
 
-            var t = FeaturesTemplates.Templates;
-            var f = new HaarFeature(t[0]);
+            var c = FeatureContainer.Templates;
+            var h = new HaarFeature(c[0]);
             var a = 1;
         }
 

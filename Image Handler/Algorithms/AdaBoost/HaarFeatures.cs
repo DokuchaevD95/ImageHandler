@@ -9,80 +9,20 @@ namespace ImageHandler.Algorithms.AdaBoost
     using ImageHandler.Extensions;
 
     /// <summary>
-    /// Считывает и хранит шаблоны признаков Хаара при первом обращении
-    /// </summary>
-    class FeaturesTemplates
-    {
-        private static string templatesPath = Path.Combine(Directory.GetCurrentDirectory(), @"Algorithms\AdaBoost\HaarFeatureTemplates");
-        private readonly static string[] templatesFileNames = Directory.GetFiles(templatesPath);
-
-        private static List<byte[,]> templates = new List<byte[,]>();
-
-        public static List<byte[,]> Templates { get => templates; }
-
-        static FeaturesTemplates()
-        {
-            foreach(string templateName in templatesFileNames)
-            {
-                byte[,] template = ReadTemplate(templateName);
-                templates.Add(template);
-            }
-        }
-
-        /// <summary>
-        /// Считывает один из шаблонов и сохраняет в двумерном байтовом массиве
-        /// </summary>
-        private static byte[,] ReadTemplate(string filepath)
-        {
-            byte[,] template;
-            int width = 0, height = 0;
-
-            using (StreamReader reader = new StreamReader(filepath))
-            {
-                string content = reader.ReadToEnd();
-                string[] lines = content.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
-                height = lines.Length;
-
-                if (height != 0)
-                    width = lines[0].Split(' ').Length;
-
-                template = new byte[width, height];
-
-                for (int y = 0; y < height; y++)
-                {
-                    byte[] lineItems = (from item in lines[y].Split(' ') select Convert.ToByte(item)).ToArray();
-
-                    for (int x = 0; x < width; x++)
-                        template[x, y] = lineItems[x];
-                }
-            }
-
-            return template;
-        }
-    }
-
-    /// <summary>
     /// Признак Хаара
     /// </summary>
     class HaarFeature
     {
-        private byte[,] template;
-        private readonly int templateWidth;
-        private readonly int templateHeight;
+        private readonly HaarFeatureTemplate template;
+
         public Rectangle whiteArea;
         public readonly List<Rectangle> blackAreas;
 
-        public HaarFeature(byte[,] template)
+        public HaarFeature(HaarFeatureTemplate template)
         {
             this.template = template;
 
-            if (this.template.Length < 1)
-                throw new ArgumentException("Шаблон признака не может быть пустым");
-
-            templateWidth = this.template.GetUpperBound(0) + 1;
-            templateHeight = this.template.Length / templateWidth;
-
-            whiteArea = new Rectangle(0, 0, templateWidth - 1, templateHeight - 1);
+            whiteArea = new Rectangle(0, 0, template.Width - 1, template.Height - 1);
             blackAreas = InitilizeBlackAreas();
         }
 
@@ -94,9 +34,9 @@ namespace ImageHandler.Algorithms.AdaBoost
         {
             List<Rectangle> areas = new List<Rectangle>();
 
-            for (int y = 0; y < templateHeight; y++)
+            for (int y = 0; y < template.Height; y++)
             {
-                for (int x = 0; x < templateWidth; x++)
+                for (int x = 0; x < template.Width; x++)
                 {
                     Point currentPosition = new Point(x, y);
 
@@ -121,14 +61,14 @@ namespace ImageHandler.Algorithms.AdaBoost
             Rectangle result;
             int blackAreaWidth = 0, blackAreaHeight = 0;
 
-            for (int y = startPoint.Y; y < templateHeight; y++)
+            for (int y = startPoint.Y; y < template.Height; y++)
             {
                 // Вычисление ширины черной области
                 if (y == startPoint.Y)
                 {
                     blackAreaHeight++;
 
-                    for (int x = startPoint.X; x < templateWidth; x++)
+                    for (int x = startPoint.X; x < template.Width; x++)
                         if (template[x, y] == 1)
                         {
                             blackAreaWidth++;
@@ -155,7 +95,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                             leftEdgeIsBlack = template[startPoint.X - 1, y] == 1;
 
                         // Проверка края справа (возможно относиться к другому признаку)
-                        if (startPoint.X + blackAreaWidth <= templateWidth)
+                        if (startPoint.X + blackAreaWidth <= template.Width)
                             rightEdgeIsBlack = template[startPoint.X + blackAreaWidth, y] == 1;
 
                         if (leftEdgeIsBlack || rightEdgeIsBlack)
