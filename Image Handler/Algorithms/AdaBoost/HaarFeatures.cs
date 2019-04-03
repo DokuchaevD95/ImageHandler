@@ -6,6 +6,8 @@ using System.Collections.Generic;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
+    using ImageHandler.Extensions;
+
     /// <summary>
     /// Считывает и хранит шаблоны признаков Хаара при первом обращении
     /// </summary>
@@ -183,11 +185,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             foreach (Rectangle area in blackAreas)
             {
-                // Contains не подходит, странная работа с гранцей прямоугольника
-                bool xInside = p.X <= area.Right && p.X >= area.Left;
-                bool yInside = p.Y <= area.Bottom && p.Y >= area.Top;
-
-                if (xInside && yInside)
+                if (area.ContainsWithEdge(p))
                 {
                     result = true;
                     break;

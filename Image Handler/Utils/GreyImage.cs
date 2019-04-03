@@ -9,6 +9,9 @@ namespace ImageHandler.Utils
 {
     using ImageHandler.Extensions;
 
+    /// <summary>
+    /// Класс для получения чб изображения из Bitmap
+    /// </summary>
     public class GreyImage
     {
         private Bitmap originalImage;
@@ -17,7 +20,9 @@ namespace ImageHandler.Utils
         public int Width { get => originalImage.Width; }
         public int Height { get => originalImage.Height; }
 
-        // преобразует матрицу значений в Bitmap
+        /// <summary>
+        /// преобразует матрицу значений в Bitmap
+        /// </summary>
         public Bitmap AsBitmap
         {
             get
@@ -46,7 +51,9 @@ namespace ImageHandler.Utils
             return greyValues[x, y];
         }
 
-        // Преобразование RGB в серый через медленный GetPixel
+        /// <summary>
+        /// Преобразование RGB в серый через медленный GetPixel
+        /// </summary>
         private static byte[,] TransformToGray(Bitmap image)
         {
             byte[,] gray = new byte[image.Width, image.Height];
@@ -64,8 +71,12 @@ namespace ImageHandler.Utils
             return gray;
         }
 
-        // Преобразование RGB в серый через блокирование в памяти и произвольный доступ
-        // При работе с изображениями большого разрешения показывает значительный прирост
+        /// <summary>
+        /// Преобразование RGB в серый через блокирование в памяти и произвольный доступ
+        /// При работе с изображениями большого разрешения показывает значительный прирост/
+        /// </summary>
+        /// <param name="image"></param>
+        /// <returns></returns>
         private static byte[,] TransformToGreyViaLockedPixels(Bitmap image)
         {
             byte[,] gray = new byte[image.Width, image.Height];

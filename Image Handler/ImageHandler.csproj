@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Extensions\BitmapExtension.cs" />
+    <Compile Include="Extensions\RectangleExtension.cs" />
     <Compile Include="Forms\StartForm.cs">
       <SubType>Form</SubType>
     </Compile>
