@@ -9,12 +9,22 @@ namespace ImageHandler.Extensions
 {
     public static class RectangleExtension
     {
-        /// <summary>
-        /// Возвращает левую нижнюю точку прямоугольника
-        /// </summary>
-        /// <param name="r"></param>
-        /// <returns></returns>
-        public static Point GetOppositeLocation(this Rectangle r)
+        public static Point LeftTop(this Rectangle r)
+        {
+            return r.Location;
+        }
+
+        public static Point LeftBottom(this Rectangle r)
+        {
+            return new Point(r.Left, r.Bottom);
+        }
+
+        public static Point RightTop(this Rectangle r)
+        {
+            return new Point(r.Right, r.Top);
+        }
+
+        public static Point RightBottom(this Rectangle r)
         {
             return new Point(r.Right, r.Bottom);
         }

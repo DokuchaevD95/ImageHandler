@@ -28,6 +28,17 @@ namespace ImageHandler.Extensions
             return new ImagePixels(img);
         }
 
+        // вырезает прямоугольник из изображения
+        public static Bitmap CropImage(this Bitmap img, Rectangle section)
+        {
+            Bitmap bmp = new Bitmap(section.Width, section.Height);
+            Graphics g = Graphics.FromImage(bmp);
+
+            g.DrawImage(img, 0, 0, section, GraphicsUnit.Pixel);
+
+            return bmp;
+        }
+
         public static void Show(this Bitmap img)
         { 
             ImageForm form = new ImageForm(img);

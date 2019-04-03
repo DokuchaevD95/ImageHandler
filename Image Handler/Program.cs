@@ -19,7 +19,15 @@ namespace ImageHandler
         {
             Application.EnableVisualStyles();
             Application.SetCompatibleTextRenderingDefault(false);
-            Application.Run(new StartForm());
+
+            try
+            {
+                Application.Run(new StartForm());
+            }
+            catch (Exception e)
+            {
+                MessageBox.Show(e.Message, "Ошибка", MessageBoxButtons.OK);
+            }
         }
     }
 }

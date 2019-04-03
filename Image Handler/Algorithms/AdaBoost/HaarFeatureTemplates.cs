@@ -27,6 +27,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                     Template[x, y] = template[x, y];
         }
 
+        // индексатор
         public byte this[int x, int y]
         {
             get
@@ -63,13 +64,13 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Контейнер. Считывает и хранит шаблоны признаков Хаара при первом обращении
     /// </summary>
-    class FeatureContainer
+    class HaarFeatureContainer
     {
         private static string templatesPath = Path.Combine(Directory.GetCurrentDirectory(), @"Algorithms\AdaBoost\HaarFeatureTemplates");
         private readonly static string[] templatesFileNames = Directory.GetFiles(templatesPath);
         public static readonly List<HaarFeatureTemplate> Templates;
 
-        static FeatureContainer()
+        static HaarFeatureContainer()
         {
 
             Templates = new List<HaarFeatureTemplate>();
