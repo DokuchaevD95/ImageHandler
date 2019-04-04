@@ -16,17 +16,17 @@ namespace ImageHandler.Extensions
 
         public static Point LeftBottom(this Rectangle r)
         {
-            return new Point(r.Left, r.Bottom);
+            return new Point(r.Left, r.Bottom - 1);
         }
 
         public static Point RightTop(this Rectangle r)
         {
-            return new Point(r.Right, r.Top);
+            return new Point(r.Right - 1, r.Top);
         }
 
         public static Point RightBottom(this Rectangle r)
         {
-            return new Point(r.Right, r.Bottom);
+            return new Point(r.Right - 1, r.Bottom - 1);
         }
 
         /// <summary>

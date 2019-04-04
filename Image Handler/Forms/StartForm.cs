@@ -9,7 +9,6 @@ using System.Threading.Tasks;
 using System.IO;
 using System.Windows.Forms;
 using System.Runtime.Serialization;
-using System.Runtime.Serialization.Json;
 
 namespace ImageHandler.Forms
 {

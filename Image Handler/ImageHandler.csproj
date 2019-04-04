@@ -73,6 +73,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\AdaBoost\Classifier.cs" />
+    <Compile Include="Algorithms\AdaBoost\HaarFeaturesVector.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarFeatureTemplates.cs" />
     <Compile Include="Extensions\BitmapExtension.cs" />
     <Compile Include="Extensions\RectangleExtension.cs" />

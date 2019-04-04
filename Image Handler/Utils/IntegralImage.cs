@@ -7,10 +7,12 @@ using System.Threading.Tasks;
 
 namespace ImageHandler.Utils
 {
+    using ImageHandler.Extensions;
+
     public class IntegralImage
     {
-        GreyImage greyImage;
-        int[,] integralImage;
+        private GreyImage greyImage;
+        private readonly int[,] integralImage;
 
         public int Width { get => greyImage.Width; }
         public int Height { get => greyImage.Height; }
@@ -27,16 +29,57 @@ namespace ImageHandler.Utils
         }
 
         /// <summary>
-        /// Проверяет, что точка лежит внутри изображения
+        /// Вычисляет сумму пикселей серого изображения в прямоугольнике
+        /// </summary>
+        /// <param name="r"></param>
+        /// <returns></returns>
+        public int GetRectangleSum(Rectangle r)
+        {
+            // TODO: оптимизировать вычисление прямоугольной области интегрального изображения
+            Point rightBottom = r.RightBottom();
+            int result = integralImage[rightBottom.X, rightBottom.Y];
+
+            if (r.X != 0 && r.Y != 0)
+            {
+                Point leftTop = r.LeftTop(), leftBottom = r.LeftBottom(), rightTop = r.RightTop();
+                result -= (integralImage[leftBottom.X - 1, leftBottom.Y] + integralImage[rightTop.X, rightTop.Y - 1] - integralImage[rightTop.X - 1, rightTop.Y - 1]);
+            }
+            else if (r.X != 0)
+            {
+                Point leftBottom = r.LeftBottom();
+                result -= integralImage[leftBottom.X - 1, leftBottom.Y];
+            }
+            else if (r.Y != 0)
+            {
+                Point rightTop = r.RightTop();
+                result -= integralImage[rightTop.X, rightTop.Y - 1];
+            }
+
+            return result;
+        }
+
+        /// <summary>
+        /// Проверяет, что точка лежит внутри интегрального изображения
         /// </summary>
         /// <param name="p"></param>
         /// <returns></returns>
-        private bool IsInside(Point p)
+        public bool PointIsInside(Point p)
         {
-            bool xInside = 0 < p.X && p.X < Width;
-            bool yInside = 0 < p.Y && p.Y < Height;
+            bool xInside = p.X >= 0 && p.X < Width;
+            bool yInside = p.Y >= 0 && p.Y < Height;
 
             return xInside && yInside;
+        }
+
+        /// <summary>
+        /// Проверяет, что прямоугольник лежит внутри интегрального
+        /// </summary>
+        /// <param name="p"></param>
+        /// <returns></returns>
+        public bool RectangleIsInside(Rectangle r)
+        {
+            Point leftTop = r.LeftTop(), rightBottom = r.RightBottom();
+            return PointIsInside(leftTop) && PointIsInside(rightBottom);
         }
 
         /// <summary>
@@ -48,14 +91,14 @@ namespace ImageHandler.Utils
         {
             int[,] result = new int[image.Width, image.Height];
 
-            for (var i = 0; i < image.Width; i++)
-                for(var j = 0; j < image.Height; j++)
+            for (var x = 0; x < image.Width; x++)
+                for(var y = 0; y < image.Height; y++)
                 {
-                    int digonalSum = i != 0 && j != 0 ? result[i, j] : 0;
-                    int leftSum = i != 0 ? result[i - 1, j] : 0;
-                    int topSum = j != 0 ? result[i, j - 1] : 0;
+                    int digonalSum = x != 0 && y != 0 ? result[x, y] : 0;
+                    int leftSum = x != 0 ? result[x - 1, y] : 0;
+                    int topSum = y != 0 ? result[x, y - 1] : 0;
 
-                    result[i, j] = image.GetValue(i, j) + leftSum + topSum - digonalSum;
+                    result[x, y] = image.GetValue(x, y) + leftSum + topSum - digonalSum;
                 }
 
             return result;
