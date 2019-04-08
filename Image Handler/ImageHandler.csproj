@@ -59,6 +59,7 @@
   </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
+    <Reference Include="System.Configuration" />
     <Reference Include="System.Core" />
     <Reference Include="System.Runtime.Serialization" />
     <Reference Include="System.Xml.Linq" />
@@ -73,8 +74,9 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\AdaBoost\Classifier.cs" />
-    <Compile Include="Algorithms\AdaBoost\HaarFeaturesVector.cs" />
-    <Compile Include="Algorithms\AdaBoost\HaarFeatureTemplates.cs" />
+    <Compile Include="Algorithms\AdaBoost\HaarFeature.cs" />
+    <Compile Include="Algorithms\AdaBoost\HaarMaskTemplates.cs" />
+    <Compile Include="Algorithms\AdaBoost\HaarScale.cs" />
     <Compile Include="Extensions\BitmapExtension.cs" />
     <Compile Include="Extensions\RectangleExtension.cs" />
     <Compile Include="Forms\StartForm.cs">
@@ -89,7 +91,7 @@
     <Compile Include="Forms\ImageForm.Designer.cs">
       <DependentUpon>ImageForm.cs</DependentUpon>
     </Compile>
-    <Compile Include="Algorithms\AdaBoost\HaarFeatures.cs" />
+    <Compile Include="Algorithms\AdaBoost\HaarMask.cs" />
     <Compile Include="Utils\ConsoleUtil.cs" />
     <Compile Include="Utils\GreyImage.cs" />
     <Compile Include="Utils\ImagePixels.cs" />
@@ -97,6 +99,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ScanWindow.cs" />
+    <Compile Include="Utils\TrainingSet.cs" />
     <EmbeddedResource Include="Forms\StartForm.resx">
       <DependentUpon>StartForm.cs</DependentUpon>
     </EmbeddedResource>

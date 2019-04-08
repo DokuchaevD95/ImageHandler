@@ -2,13 +2,13 @@
 using System.IO;
 using System.Linq;
 using System.Drawing;
+using System.Security.Cryptography;
 using System.Windows.Forms;
 using System.Collections.Generic;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
     using ImageHandler.Forms;
-    using ImageHandler.Extensions;
 
     enum HaarSizeDirection
     {
@@ -17,117 +17,44 @@ namespace ImageHandler.Algorithms.AdaBoost
     }
 
     /// <summary>
-    /// Признак Хаара
+    /// Маска Хаара
     /// </summary>
-    class HaarFeature
+    class HaarMask
     {
-        private readonly HaarFeatureTemplate template;
+        private readonly HaarMaskTemplate template;
 
         public int Width { get => whiteArea.Width; }
         public int Height { get => whiteArea.Height; }
 
-        public Rectangle whiteArea;
-        public List<Rectangle> blackAreas;
+        public readonly Rectangle whiteArea;
+        public readonly List<Rectangle> blackAreas;
 
-        private int currentScale;
-
-        public HaarFeature(HaarFeatureTemplate template)
+        public HaarMask(HaarMaskTemplate template)
         {
             this.template = template;
-
+            
             whiteArea = new Rectangle(0, 0, template.Width, template.Height);
             blackAreas = InitilizeBlackAreas();
-
-            currentScale = 1;
         }
 
-        /// <summary>
-        /// Смещает признак Хаара на координаты X и Y точки
-        /// </summary>
-        /// <param name="p"></param>
-        void Offset(Point p)
+        public List<HaarScale> GetAvailableScales(Point startPoint, Size imgSize)
         {
-            whiteArea.Offset(p);
-            foreach (Rectangle area in blackAreas)
-                area.Offset(p);
+            List<HaarScale> result = new List<HaarScale>();
+
+            int heightMultiplier = 1;
+            while (startPoint.Y * heightMultiplier + Height < imgSize.Height)
+            {
+                int widthMultiplier = 1;
+
+                while (startPoint.X * widthMultiplier + Width < imgSize.Width)
+                    result.Add(new HaarScale(widthMultiplier, heightMultiplier));
+            }
+
+            return result;
         }
 
         /// <summary>
-        /// Увеличивает размер признака
-        /// </summary>
-        /// <param name="attr">Ширина либо высота</param>
-        public void Increase(HaarSizeDirection direction)
-        {
-            currentScale *= 2;
-
-            if (direction == HaarSizeDirection.Width)
-            {
-                whiteArea.Width *= 2;
-                
-                // Приходиться менять полностью структуру, т.к. struct не ссылочный тип
-                for (int i = 0; i < blackAreas.Count; i++)
-                {
-                    Rectangle tmp = blackAreas[i];
-                    tmp.Width *= 2;
-                    tmp.Offset(new Point(tmp.X, 0));
-                    blackAreas[i] = tmp;
-                }
-            }
-            else
-            {
-                whiteArea.Height *= 2;
-
-                // Приходиться менять полностью структуру, т.к. struct не ссылочный тип
-                for (int i = 0; i < blackAreas.Count; i++)
-                {
-                    Rectangle tmp = blackAreas[i];
-                    tmp.Height *= 2;
-                    tmp.Offset(new Point(0, tmp.Y));
-                    blackAreas[i] = tmp;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Увеличивает размер признака
-        /// </summary>
-        /// <param name="attr">Ширина либо высота</param>
-        public void Decrease(HaarSizeDirection direction)
-        {
-            currentScale /= 2;
-            if (currentScale < 1)
-                throw new InvalidOperationException("Признак Хаара не может быть меньше своего шаблона.");
-
-            if (direction == HaarSizeDirection.Width)
-            {
-                whiteArea.Width /= 2;
-
-                // Приходиться менять полностью структуру, т.к. struct не ссылочный тип
-                for (int i = 0; i < blackAreas.Count; i++)
-                {
-                    Rectangle tmp = blackAreas[i];
-                    tmp.Width /= 2;
-                    tmp.Offset(new Point(-tmp.X / 2, 0));
-                    blackAreas[i] = tmp;
-                }
-            }
-            else
-            {
-                whiteArea.Height /= 2;
-
-                // Приходиться менять полностью структуру, т.к. struct не ссылочный тип
-                for (int i = 0; i < blackAreas.Count; i++)
-                {
-                    Rectangle tmp = blackAreas[i];
-                    tmp.Height /= 2;
-                    tmp.Offset(new Point(0, -tmp.Y / 2));
-                    blackAreas[i] = tmp;
-                }
-            }
-        }
-
-        /// <summary>
-        /// Отображает признак в форме
+        /// Отображает маску в форме
         /// </summary>
         public void Show()
         {
