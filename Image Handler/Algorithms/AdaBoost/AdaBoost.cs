@@ -6,7 +6,7 @@ using System.Threading.Tasks;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
-    class Classifier
+    class AdaBoost
     {
     }
 }

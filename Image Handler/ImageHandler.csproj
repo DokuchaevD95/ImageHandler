@@ -73,7 +73,7 @@
     <Reference Include="System.Xml" />
   </ItemGroup>
   <ItemGroup>
-    <Compile Include="Algorithms\AdaBoost\Classifier.cs" />
+    <Compile Include="Algorithms\AdaBoost\AdaBoost.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarFeature.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarMaskTemplates.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarScale.cs" />
@@ -98,7 +98,7 @@
     <Compile Include="Utils\IntegralImage.cs" />
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
-    <Compile Include="Utils\ScanWindow.cs" />
+    <Compile Include="Utils\ScanningWindow.cs" />
     <Compile Include="Utils\TrainingSet.cs" />
     <EmbeddedResource Include="Forms\StartForm.resx">
       <DependentUpon>StartForm.cs</DependentUpon>

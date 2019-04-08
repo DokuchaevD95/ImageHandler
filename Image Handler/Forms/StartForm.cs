@@ -34,8 +34,8 @@ namespace ImageHandler.Forms
 
             if (new string[] { "png", "jpg", "bmp" }.Contains(extension))
             {
-                Bitmap img = new Bitmap(fileName);
-                img.GetGreyImage().AsBitmap.Show();
+                Bitmap img = new Bitmap(Image.FromFile(fileName));
+                img.Show();
             }
             else
             {
