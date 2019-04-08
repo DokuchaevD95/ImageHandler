@@ -12,11 +12,11 @@ namespace ImageHandler.Utils
 {
     class TrainingSet
     {
-        public static string trueSetPath = @"trainingSet\true";
-        public static string falseSetPath = @"trainingSet\false";
+        public static string trueSetPath = ConfigurationManager.AppSettings["TrueSetPath"];
+        public static string falseSetPath = ConfigurationManager.AppSettings["FlseSetPath"];
 
-        public static readonly int defaultWidth = Convert.ToInt32(ConfigurationManager.AppSettings["TriningWidth"]); 
-        public static readonly int defaultHeight = Convert.ToInt32(ConfigurationManager.AppSettings["TriningHeight"]); 
+        public static readonly int defaultWidth = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingWidth"]); 
+        public static readonly int defaultHeight = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingHeight"]); 
 
         public static List<Bitmap> GetTrueSet()
         {
