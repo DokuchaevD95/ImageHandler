@@ -18,6 +18,30 @@ namespace ImageHandler.Utils
         public static readonly int defaultWidth = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingWidth"]); 
         public static readonly int defaultHeight = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingHeight"]); 
 
+        public static int CountTrue
+        {
+            get
+            {
+                return Directory.GetFiles(trueSetPath).Length;
+            }
+        }
+
+        public static int CountFalse
+        {
+            get
+            {
+                return Directory.GetFiles(falseSetPath).Length;
+            }
+        }
+
+        public static int Count
+        {
+            get
+            {
+                return Directory.GetFiles(trueSetPath).Length + Directory.GetFiles(falseSetPath).Length;
+            }
+        }
+
         public static List<Bitmap> GetTrueSet()
         {
             if (!Directory.Exists(trueSetPath))
