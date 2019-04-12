@@ -67,7 +67,6 @@ namespace ImageHandler.Algorithms.AdaBoost
 
         static HaarMaskTemplatesContainer()
         {
-
             Templates = new List<HaarMaskTemplate>();
 
             foreach (string templateName in templatesFileNames)

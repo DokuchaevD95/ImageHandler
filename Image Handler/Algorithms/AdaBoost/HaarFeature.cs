@@ -46,5 +46,39 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             return result;
         }
+
+        public static List<HaarFeature> GetAvailableHaarFeatures(HaarMask mask, Size imgSize)
+        {
+            List<HaarFeature> result = new List<HaarFeature>();
+
+            for (int x = 0; x + mask.Width <= imgSize.Width; x++)
+                for (int y = 0; y + mask.Height <= imgSize.Height; y++)
+                {
+                    Point currentPoint = new Point(x, y);
+
+                    foreach (HaarScale scale in GetAvailableScales(mask, currentPoint, imgSize))
+                        result.Add(new HaarFeature(mask, currentPoint, scale));
+                }
+
+
+            return result;
+        }
+
+        public static List<HaarScale> GetAvailableScales(HaarMask mask, Point startPoint, Size imgSize)
+        {
+            List<HaarScale> result = new List<HaarScale>();
+
+            int heightMultiplier = 1;
+            while (startPoint.Y + mask.Height * heightMultiplier <= imgSize.Height)
+            {
+                int widthMultiplier = 1;
+
+                while (startPoint.X + mask.Width + widthMultiplier <= imgSize.Width)
+                    result.Add(new HaarScale(widthMultiplier, heightMultiplier));
+            }
+
+            return result;
+        }
+
     }
 }

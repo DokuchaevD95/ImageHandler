@@ -6,17 +6,13 @@ using System.IO;
 using System.Threading.Tasks;
 using System.Configuration;
 using System.Drawing;
-using System.Collections.Specialized;
 
 namespace ImageHandler.Utils
 {
-    class TrainingSet
+    class TrainingImagesSet
     {
         public static string trueSetPath = ConfigurationManager.AppSettings["TrueSetPath"];
         public static string falseSetPath = ConfigurationManager.AppSettings["FlseSetPath"];
-
-        public static readonly int defaultWidth = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingWidth"]); 
-        public static readonly int defaultHeight = Convert.ToInt32(ConfigurationManager.AppSettings["TrainingHeight"]); 
 
         public static int CountTrue
         {
@@ -42,7 +38,7 @@ namespace ImageHandler.Utils
             }
         }
 
-        public static List<Bitmap> GetTrueSet()
+        public static List<Bitmap> GetTrueSet(int size)
         {
             if (!Directory.Exists(trueSetPath))
                 throw new DirectoryNotFoundException("Папка с обучающей выборкой не найдена (true набор)");
@@ -51,14 +47,14 @@ namespace ImageHandler.Utils
             
             foreach(string fileName in Directory.GetFiles(trueSetPath))
             {
-                Bitmap downloadedImage = new Bitmap(Image.FromFile(fileName), defaultWidth, defaultHeight);
+                Bitmap downloadedImage = new Bitmap(Image.FromFile(fileName), size, size);
                 result.Add(downloadedImage);
             }
 
             return result;
         }
 
-        public static List<Bitmap> GetFalseSet()
+        public static List<Bitmap> GetFalseSet(int size)
         {
             if (!Directory.Exists(trueSetPath))
                 throw new DirectoryNotFoundException("Папка с обучающей выборкой не найдена (false набор)");
@@ -67,7 +63,7 @@ namespace ImageHandler.Utils
 
             foreach (string fileName in Directory.GetFiles(falseSetPath))
             {
-                Bitmap downloadedImage = new Bitmap(Image.FromFile(fileName), defaultWidth, defaultHeight);
+                Bitmap downloadedImage = new Bitmap(Image.FromFile(fileName), size, size);
                 result.Add(downloadedImage);
             }
 

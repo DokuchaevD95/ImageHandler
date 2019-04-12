@@ -10,12 +10,6 @@ namespace ImageHandler.Algorithms.AdaBoost
 {
     using ImageHandler.Forms;
 
-    enum HaarSizeDirection
-    {
-        Width,
-        Height
-    }
-
     /// <summary>
     /// Маска Хаара
     /// </summary>
@@ -35,22 +29,6 @@ namespace ImageHandler.Algorithms.AdaBoost
             
             whiteArea = new Rectangle(0, 0, template.Width, template.Height);
             blackAreas = InitilizeBlackAreas();
-        }
-
-        public List<HaarScale> GetAvailableScales(Point startPoint, Size imgSize)
-        {
-            List<HaarScale> result = new List<HaarScale>();
-
-            int heightMultiplier = 1;
-            while (startPoint.Y * heightMultiplier + Height < imgSize.Height)
-            {
-                int widthMultiplier = 1;
-
-                while (startPoint.X * widthMultiplier + Width < imgSize.Width)
-                    result.Add(new HaarScale(widthMultiplier, heightMultiplier));
-            }
-
-            return result;
         }
 
         /// <summary>

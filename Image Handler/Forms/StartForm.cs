@@ -27,7 +27,7 @@ namespace ImageHandler.Forms
         {
             OpenFileDialog dialog = new OpenFileDialog();
             dialog.ShowDialog();
-
+            
             string fileName = dialog.FileName;
             string[] splitedFileName = dialog.FileName.Split('.');
             string extension = splitedFileName[splitedFileName.Length - 1];
