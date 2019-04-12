@@ -12,7 +12,7 @@ namespace ImageHandler.Utils
     class TrainingImagesSet
     {
         public static string trueSetPath = ConfigurationManager.AppSettings["TrueSetPath"];
-        public static string falseSetPath = ConfigurationManager.AppSettings["FlseSetPath"];
+        public static string falseSetPath = ConfigurationManager.AppSettings["FalseSetPath"];
 
         public static int CountTrue
         {

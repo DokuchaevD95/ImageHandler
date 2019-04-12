@@ -276,7 +276,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                 result.Add(new TrainingObject(trainingImage, 1, 1 / trueAmount));
 
             int falseAmount = TrainingImagesSet.CountFalse;
-            foreach (Bitmap trainingImage in TrainingImagesSet.GetTrueSet(trainingImageSize))
+            foreach (Bitmap trainingImage in TrainingImagesSet.GetFalseSet(trainingImageSize))
                 result.Add(new TrainingObject(trainingImage, 0, 1 / falseAmount));
 
             return result;

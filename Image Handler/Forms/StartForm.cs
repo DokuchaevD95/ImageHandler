@@ -35,12 +35,14 @@ namespace ImageHandler.Forms
             if (new string[] { "png", "jpg", "bmp" }.Contains(extension))
             {
                 Bitmap img = new Bitmap(Image.FromFile(fileName));
+                AdaBoost.Train(20);
                 img.Show();
             }
             else
             {
                 MessageBox.Show("Неверное расширение файла", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+
         }
 
         private void StartForm_Load(object sender, EventArgs e)
