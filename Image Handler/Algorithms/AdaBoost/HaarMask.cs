@@ -111,7 +111,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                             leftEdgeIsBlack = template[startPoint.X - 1, y] == 1;
 
                         // Проверка края справа (возможно относиться к другому признаку)
-                        if (startPoint.X + blackAreaWidth <= template.Width)
+                        if (startPoint.X + blackAreaWidth < template.Width)
                             rightEdgeIsBlack = template[startPoint.X + blackAreaWidth, y] == 1;
 
                         if (leftEdgeIsBlack || rightEdgeIsBlack)

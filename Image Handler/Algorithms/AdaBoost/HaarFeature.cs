@@ -73,8 +73,13 @@ namespace ImageHandler.Algorithms.AdaBoost
             {
                 int widthMultiplier = 1;
 
-                while (startPoint.X + mask.Width + widthMultiplier <= imgSize.Width)
+                while (startPoint.X + mask.Width * widthMultiplier <= imgSize.Width)
+                {
                     result.Add(new HaarScale(widthMultiplier, heightMultiplier));
+                    widthMultiplier++;
+                }
+
+                heightMultiplier++;
             }
 
             return result;

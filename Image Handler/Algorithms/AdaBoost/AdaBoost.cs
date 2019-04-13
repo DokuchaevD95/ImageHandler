@@ -201,8 +201,8 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <returns></returns>
         public static List<WeakClassifier> Train(int featuresAmount)
         {
-            List<TrainingObject> trainingSet = InitTrainingSet();
             List<WeakClassifier> result = new List<WeakClassifier>();
+            List<TrainingObject> trainingSet = InitTrainingSet();
             List<HaarFeature> allFeatures = GetAllAvailableHaarFeatures();
 
             for (int i = 0; i < featuresAmount; i++)
@@ -273,11 +273,11 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             int trueAmount = TrainingImagesSet.CountTrue;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetTrueSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 1, 1 / trueAmount));
+                result.Add(new TrainingObject(trainingImage, 1, 1.0 / trueAmount));
 
             int falseAmount = TrainingImagesSet.CountFalse;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetFalseSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 0, 1 / falseAmount));
+                result.Add(new TrainingObject(trainingImage, 0, 1.0 / falseAmount));
 
             return result;
         }
