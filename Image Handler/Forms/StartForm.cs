@@ -35,7 +35,11 @@ namespace ImageHandler.Forms
             if (new string[] { "png", "jpg", "bmp" }.Contains(extension))
             {
                 Bitmap img = new Bitmap(Image.FromFile(fileName));
-                AdaBoost.Train(20);
+                AdaBoost clf = AdaBoost.Train(30);
+
+                var value = clf.Recognize(img);
+                var a = 1;
+
                 img.Show();
             }
             else
