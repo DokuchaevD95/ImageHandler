@@ -322,11 +322,11 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             int trueAmount = TrainingImagesSet.CountTrue;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetTrueSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 1, 1.0 / trueAmount));
+                result.Add(new TrainingObject(trainingImage, 1, 1.0 / 2.0 * trueAmount));
 
             int falseAmount = TrainingImagesSet.CountFalse;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetFalseSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 0, 1.0 / falseAmount));
+                result.Add(new TrainingObject(trainingImage, 0, 1.0 / 2.0 * falseAmount));
 
             return result;
         }
