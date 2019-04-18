@@ -71,7 +71,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             if (trainingSet.Count <= 2)
                 throw new AdaBoostException("Обучающая выборка из менее чем 2 элементов ???");
 
-            List<(TrainingObject, int)> calculatedPairs = GetPairs(feature, trainingSet);
+            List<(TrainingObject trainingObj, int featureValue)> calculatedPairs = GetPairs(feature, trainingSet);
             (double fullPositiveSumm, double fullNegtiveSumm) = GetPosisitveAndNegativeSumms(calculatedPairs);
 
             byte sign = 0;
@@ -80,14 +80,15 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             for (int i = 1; i < calculatedPairs.Count; i++)
             {
-                (TrainingObject, int) currPair = calculatedPairs[i], prevPair = calculatedPairs[i - 1];
+                (TrainingObject trainingObj, int featureValue) currPair = calculatedPairs[i];
+                (TrainingObject trainingObj, int featureValue) prevPair = calculatedPairs[i - 1];
 
-                if (currPair.Item1.classNumber == 1)
-                    prevPositiveSumm += currPair.Item1.weight;
+                if (currPair.trainingObj.classNumber == 1)
+                    prevPositiveSumm += currPair.trainingObj.weight;
                 else
-                    prevNegativeSumm += currPair.Item1.weight;
+                    prevNegativeSumm += currPair.trainingObj.weight;
 
-                currTreshold = (prevPair.Item2 + currPair.Item2) / 2.0;
+                currTreshold = (prevPair.featureValue + currPair.featureValue) / 2.0;
 
                 // С положительным знаков
                 currError = prevNegativeSumm + fullPositiveSumm - prevPositiveSumm;
@@ -117,14 +118,14 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <param name="feature"></param>
         /// <param name="trainingSet"></param>
         /// <returns>(объект тренировочной выборки, значение знака Хаара)</returns>
-        private static List<(TrainingObject, int)> GetPairs(HaarFeature feature, List<TrainingObject> trainingSet)
+        private static List<(TrainingObject obj, int featureValue)> GetPairs(HaarFeature feature, List<TrainingObject> trainingSet)
         {
             return (
                 from obj in trainingSet
                 let featureValue = feature.GetValue(obj.img)
                 orderby featureValue
                 select (obj, featureValue)
-            ).ToList();
+            ).AsParallel().ToList();
         }
 
         /// <summary>
@@ -155,11 +156,20 @@ namespace ImageHandler.Algorithms.AdaBoost
     {
         public readonly HaarFeature feature;
         public readonly Treashold treshold;
+        public double weight;
+
+        public WeakClassifier(HaarFeature feature, Treashold treshold, double weight)
+        {
+            this.feature = feature;
+            this.treshold = treshold;
+            this.weight = weight;
+        }
 
         public WeakClassifier(HaarFeature feature, Treashold treshold)
         {
             this.feature = feature;
             this.treshold = treshold;
+            this.weight = 0;
         }
 
         public int GetValue(IntegralImage img)
@@ -194,11 +204,11 @@ namespace ImageHandler.Algorithms.AdaBoost
     {
         private static readonly int trainingImageSize = Convert.ToInt32(ConfigurationManager.AppSettings["AdaBoostTrainingImageSize"]);
 
-        private List<(WeakClassifier weakClassifier, double betta)> classifierPairs;
+        private List<WeakClassifier> weakClassifiers;
 
-        public AdaBoost(List<(WeakClassifier weakClassifier, double betta)> classifierPairs)
+        public AdaBoost(List<WeakClassifier> weakClassifiers)
         {
-            this.classifierPairs = classifierPairs;
+            this.weakClassifiers = weakClassifiers;
         }
 
         public int Recognize(Bitmap img)
@@ -209,10 +219,10 @@ namespace ImageHandler.Algorithms.AdaBoost
             IntegralImage integralImg = img.GetIntegralImage();
 
             double leftValue = 0, rightValue = 0;
-            foreach ((WeakClassifier weakClassifier, double betta) in classifierPairs)
+            foreach (WeakClassifier weakClassifier in weakClassifiers)
             {
-                leftValue += Math.Log(1.0 / betta) * weakClassifier.GetValue(integralImg);
-                rightValue += 0.5 * Math.Log(1.0 / betta);
+                leftValue += Math.Log(1.0 / weakClassifier.weight) * weakClassifier.GetValue(integralImg);
+                rightValue += 0.5 * Math.Log(1.0 / weakClassifier.weight);
             }
 
             int result = leftValue >= rightValue ? 1 : 0;
@@ -226,7 +236,7 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <returns></returns>
         public static AdaBoost Train(int featuresAmount)
         {
-            List<(WeakClassifier, double)> result = new List<(WeakClassifier, double)>();
+            List<WeakClassifier> result = new List<WeakClassifier>();
             List<TrainingObject> trainingSet = InitTrainingSet();
             List<HaarFeature> allFeatures = GetAllAvailableHaarFeatures();
 
@@ -234,21 +244,26 @@ namespace ImageHandler.Algorithms.AdaBoost
             {
                 trainingSet = NormlizeWeights(trainingSet);
 
-                List<(WeakClassifier weakClassifier, double error)> weakClassifierErrors = new List<(WeakClassifier, double)>();
+                WeakClassifier bestWeakClassifier = null;
+                double minimalError = 0;
+
                 foreach (HaarFeature feature in allFeatures)
                 {
                     Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
                     WeakClassifier wc = new WeakClassifier(feature, treshold);
+                    double wcError = wc.GetError(trainingSet);
 
-                    weakClassifierErrors.Add((wc, wc.GetError(trainingSet)));
+                    if(bestWeakClassifier == null || wcError < minimalError)
+                    {
+                        bestWeakClassifier = wc;
+                        minimalError = wcError;
+                    }
                 }
 
-                (WeakClassifier bestClassifier, double error) = weakClassifierErrors.OrderBy(pair => pair.error).First();
-                double betta = error / (1.0 - error);
+                bestWeakClassifier.weight = minimalError / (1.0 - minimalError);
+                result.Add(bestWeakClassifier);
 
-                trainingSet = UpdateWeights(trainingSet, bestClassifier, betta);
-
-                result.Add((bestClassifier, betta));
+                trainingSet = UpdateWeights(trainingSet, bestWeakClassifier);
             }
 
             return new AdaBoost(result);
@@ -299,12 +314,12 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <param name="weakClassifier"></param>
         /// <param name="betta"></param>
         /// <returns></returns>
-        private static List<TrainingObject> UpdateWeights(List<TrainingObject> trainingSet, WeakClassifier weakClassifier, double betta)
+        private static List<TrainingObject> UpdateWeights(List<TrainingObject> trainingSet, WeakClassifier weakClassifier)
         {
             foreach (TrainingObject obj in trainingSet)
             {
                 int degree = Math.Abs(weakClassifier.GetValue(obj.img) - obj.classNumber);
-                double multiplier = Math.Pow(betta, 1 - degree);
+                double multiplier = Math.Pow(weakClassifier.weight, 1 - degree);
 
                 obj.weight *= multiplier;
             }
