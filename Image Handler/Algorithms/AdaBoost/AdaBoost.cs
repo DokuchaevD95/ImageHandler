@@ -84,9 +84,9 @@ namespace ImageHandler.Algorithms.AdaBoost
                 (TrainingObject trainingObj, int featureValue) prevPair = calculatedPairs[i - 1];
 
                 if (currPair.trainingObj.classNumber == 1)
-                    prevPositiveSumm += currPair.trainingObj.weight;
+                    prevPositiveSumm += prevPair.trainingObj.weight;
                 else
-                    prevNegativeSumm += currPair.trainingObj.weight;
+                    prevNegativeSumm += prevPair.trainingObj.weight;
 
                 currTreshold = (prevPair.featureValue + currPair.featureValue) / 2.0;
 
