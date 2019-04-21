@@ -4,6 +4,7 @@ using System.Linq;
 using System.Drawing;
 using System.Security.Cryptography;
 using System.Windows.Forms;
+using Newtonsoft.Json;
 using System.Collections.Generic;
 
 namespace ImageHandler.Algorithms.AdaBoost
@@ -13,15 +14,31 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Маска Хаара
     /// </summary>
-    class HaarMask
+    [JsonObject(MemberSerialization.OptIn)]
+    public class HaarMask
     {
         private readonly HaarMaskTemplate template;
+        [JsonProperty] public string TemplateName { get => template.name; }
 
         public int Width { get => whiteArea.Width; }
         public int Height { get => whiteArea.Height; }
 
         public readonly Rectangle whiteArea;
         public readonly List<Rectangle> blackAreas;
+
+        [JsonConstructor]
+        public HaarMask(string templateName)
+        {
+            foreach (HaarMaskTemplate template in HaarMaskTemplatesContainer.Templates)
+                if (template.name == templateName)
+                {
+                    this.template = template;
+                    break;
+                }
+
+            whiteArea = new Rectangle(0, 0, template.Width, template.Height);
+            blackAreas = InitilizeBlackAreas();
+        }
 
         public HaarMask(HaarMaskTemplate template)
         {

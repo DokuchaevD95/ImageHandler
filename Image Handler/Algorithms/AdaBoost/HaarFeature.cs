@@ -3,18 +3,21 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Drawing;
 using System.Text;
+using Newtonsoft.Json;
 using System.Threading.Tasks;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
     using ImageHandler.Utils;
 
-    class HaarFeature
+    [JsonObject(MemberSerialization.OptIn)]
+    public class HaarFeature
     {
-        public readonly HaarMask mask;
-        public readonly Point startPoint;
-        public readonly HaarScale scale;
+        [JsonProperty] public readonly HaarMask mask;
+        [JsonProperty] public readonly Point startPoint;
+        [JsonProperty] public readonly HaarScale scale;
 
+        [JsonConstructor]
         public HaarFeature(HaarMask mask, Point startPoint, HaarScale scale)
         {
             this.mask = mask;

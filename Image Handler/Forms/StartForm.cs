@@ -36,6 +36,9 @@ namespace ImageHandler.Forms
             {
                 Bitmap img = new Bitmap(Image.FromFile(fileName));
                 AdaBoost clf = AdaBoost.Train(1);
+                
+                string dumpName = clf.Save();
+                clf = AdaBoost.Load(dumpName);
 
                 var value = clf.Recognize(img);
                 var a = 1;

@@ -1,10 +1,12 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.IO;
 using System.Text;
 using System.Configuration;
 using System.Drawing;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
@@ -20,7 +22,7 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Обертка для обучающего примера из выборки
     /// </summary>
-    internal class TrainingObject
+    public class TrainingObject
     {
         public readonly IntegralImage img;
         public readonly byte classNumber;
@@ -46,17 +48,17 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Порог признака Хаара
     /// </summary>
-    internal class Treashold
+    [JsonObject(MemberSerialization.OptIn)]
+    public class Treashold
     {
-        public byte sign;
-        public double tresholdValue;
-        public HaarFeature feature;
+        [JsonProperty] public byte sign;
+        [JsonProperty] public double tresholdValue;
 
-        public Treashold(byte sign, double tresholdValue, HaarFeature feature)
+        [JsonConstructor]
+        public Treashold(byte sign, double tresholdValue)
         {
             this.sign = sign;
             this.tresholdValue = tresholdValue;
-            this.feature = feature;
         }
 
         /// <summary>
@@ -109,7 +111,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                 }
             }
 
-            return new Treashold(sign, treshold, feature);
+            return new Treashold(sign, treshold);
         }
 
         /// <summary>
@@ -152,12 +154,14 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Слабый классификатор на базе которых строиться сильный
     /// </summary>
-    internal class WeakClassifier
+    [JsonObject(MemberSerialization.OptIn)]
+    public class WeakClassifier
     {
-        public readonly HaarFeature feature;
-        public readonly Treashold treshold;
-        public double weight;
+        [JsonProperty] public readonly HaarFeature feature;
+        [JsonProperty] public readonly Treashold treshold;
+        [JsonProperty] public double weight;
 
+        [JsonConstructor]
         public WeakClassifier(HaarFeature feature, Treashold treshold, double weight)
         {
             this.feature = feature;
@@ -199,13 +203,14 @@ namespace ImageHandler.Algorithms.AdaBoost
         }
     }
 
-
-    class AdaBoost
+    [JsonObject(MemberSerialization.OptIn)]
+    public class AdaBoost
     {
         private static readonly int trainingImageSize = Convert.ToInt32(ConfigurationManager.AppSettings["AdaBoostTrainingImageSize"]);
 
-        private List<WeakClassifier> weakClassifiers;
+        [JsonProperty] public readonly List<WeakClassifier> weakClassifiers;
 
+        [JsonConstructor]
         public AdaBoost(List<WeakClassifier> weakClassifiers)
         {
             this.weakClassifiers = weakClassifiers;
@@ -226,6 +231,34 @@ namespace ImageHandler.Algorithms.AdaBoost
             }
 
             int result = leftValue >= rightValue ? 1 : 0;
+            return result;
+        }
+
+        public string Save()
+        {
+            string fileName = $"AdaBoost {DateTime.Now.ToString()}.json";
+            fileName = fileName.Replace(':', '.');
+
+            using (StreamWriter file = new StreamWriter(fileName))
+            using (JsonWriter writer = new JsonTextWriter(file))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(writer, this);
+            }
+
+            return fileName;
+        }
+
+        public static AdaBoost Load(string fileName)
+        {
+            AdaBoost result;
+
+            using (StreamReader file = new StreamReader(fileName))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                result = (AdaBoost)serializer.Deserialize(file, typeof(AdaBoost));
+            }
+
             return result;
         }
 

@@ -3,17 +3,20 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Newtonsoft.Json;
 
 namespace ImageHandler.Algorithms.AdaBoost
 {
     /// <summary>
     /// Класс для хранения коэффициентов скалирования признака Хаара
     /// </summary>
-    class HaarScale
+    [JsonObject(MemberSerialization.OptIn)]
+    public class HaarScale
     {
-        public readonly int widthMultiplier;
-        public readonly int heightMultiplier;
+        [JsonProperty] public readonly int widthMultiplier;
+        [JsonProperty] public readonly int heightMultiplier;
 
+        [JsonConstructor]
         public HaarScale(int widthMultiplier, int heightMultiplier)
         {
             if (widthMultiplier < 1 || heightMultiplier < 1)

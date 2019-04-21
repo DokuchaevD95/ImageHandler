@@ -10,34 +10,17 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// <summary>
     /// Шаблон признака Хаара
     /// </summary>
-    class HaarMaskTemplate
+    public class HaarMaskTemplate
     {
         public readonly byte[,] Template;
         public readonly int Width;
         public readonly int Height;
+        public readonly string name;
 
-        private HaarMaskTemplate(byte[,] template, int width, int height)
+        public HaarMaskTemplate(string name, string content, string lineDelimeter = "\r\n", string columnDelimeter = " ")
         {
-            Width = width;
-            Height = height;
-            Template = new byte[Width, Height];
+            this.name = name;
 
-            for (int x = 0; x < Width; x++)
-                for (int y = 0; y < Height; y++)
-                    Template[x, y] = template[x, y];
-        }
-
-        // индексатор
-        public byte this[int x, int y]
-        {
-            get
-            {
-                return Template[x, y];
-            }
-        }
-
-        public HaarMaskTemplate(string content, string lineDelimeter="\r\n", string columnDelimeter=" ")
-        {
             string[] lines = content.Split(new string[] { "\r\n" }, StringSplitOptions.RemoveEmptyEntries);
             Height = lines.Length;
 
@@ -53,6 +36,32 @@ namespace ImageHandler.Algorithms.AdaBoost
                 for (int x = 0; x < Width; x++)
                     Template[x, y] = lineItems[x];
             }
+        }
+
+        // индексатор
+        public byte this[int x, int y]
+        {
+            get
+            {
+                return Template[x, y];
+            }
+        }
+
+        /// <summary>
+        /// Считывает один из шаблонов и сохраняет в двумерном байтовом массиве
+        /// </summary>
+        public static HaarMaskTemplate ReadTemplate(string filepath)
+        {
+            HaarMaskTemplate template;
+            string name = Path.GetFileName(filepath);
+
+            using (StreamReader reader = new StreamReader(filepath))
+            {
+                string content = reader.ReadToEnd();
+                template = new HaarMaskTemplate(name, content);
+            }
+
+            return template;
         }
     }
 
@@ -71,25 +80,9 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             foreach (string templateName in templatesFileNames)
             {
-                HaarMaskTemplate template = ReadTemplate(templateName);
+                HaarMaskTemplate template = HaarMaskTemplate.ReadTemplate(templateName);
                 Templates.Add(template);
             }
-        }
-
-        /// <summary>
-        /// Считывает один из шаблонов и сохраняет в двумерном байтовом массиве
-        /// </summary>
-        private static HaarMaskTemplate ReadTemplate(string filepath)
-        {
-            HaarMaskTemplate template;
-
-            using (StreamReader reader = new StreamReader(filepath))
-            {
-                string content = reader.ReadToEnd();
-                template = new HaarMaskTemplate(content);
-            }
-
-            return template;
         }
     }
 }
