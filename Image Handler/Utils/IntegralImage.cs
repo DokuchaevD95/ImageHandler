@@ -12,7 +12,7 @@ namespace ImageHandler.Utils
     public class IntegralImage
     {
         private GreyImage greyImage;
-        private readonly int[,] integralImage;
+        private readonly long[,] integralImage;
 
         public int Width { get => greyImage.Width; }
         public int Height { get => greyImage.Height; }
@@ -23,7 +23,7 @@ namespace ImageHandler.Utils
             integralImage = TransformToIntegral(image);
         }
 
-        public int GetPixel(int x, int y)
+        public long GetPixel(int x, int y)
         {
             return integralImage[x, y];
         }
@@ -33,11 +33,11 @@ namespace ImageHandler.Utils
         /// </summary>
         /// <param name="r"></param>
         /// <returns></returns>
-        public int GetRectangleSum(Rectangle r)
+        public long GetRectangleSum(Rectangle r)
         {
             // TODO: оптимизировать вычисление прямоугольной области интегрального изображения
             Point rightBottom = r.RightBottom();
-            int result = integralImage[rightBottom.X, rightBottom.Y];
+            long result = integralImage[rightBottom.X, rightBottom.Y];
 
             if (r.X != 0 && r.Y != 0)
             {
@@ -87,16 +87,16 @@ namespace ImageHandler.Utils
         /// </summary>
         /// <param name="image"></param>
         /// <returns></returns>
-        public static int[,] TransformToIntegral(GreyImage image)
+        public static long[,] TransformToIntegral(GreyImage image)
         {
-            int[,] result = new int[image.Width, image.Height];
+            long[,] result = new long[image.Width, image.Height];
 
             for (var x = 0; x < image.Width; x++)
                 for(var y = 0; y < image.Height; y++)
                 {
-                    int digonalSum = x != 0 && y != 0 ? result[x, y] : 0;
-                    int leftSum = x != 0 ? result[x - 1, y] : 0;
-                    int topSum = y != 0 ? result[x, y - 1] : 0;
+                    long digonalSum = x != 0 && y != 0 ? result[x - 1, y - 1] : 0;
+                    long leftSum = x != 0 ? result[x - 1, y] : 0;
+                    long topSum = y != 0 ? result[x, y - 1] : 0;
 
                     result[x, y] = image.GetValue(x, y) + leftSum + topSum - digonalSum;
                 }

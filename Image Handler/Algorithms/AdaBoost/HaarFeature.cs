@@ -25,7 +25,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             this.scale = scale;
         }
 
-        public int GetValue(IntegralImage img)
+        public long GetValue(IntegralImage img)
         {
             Rectangle whiteArea = mask.whiteArea;
 
@@ -33,7 +33,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             whiteArea.Width *= scale.widthMultiplier;
             whiteArea.Height *= scale.heightMultiplier;
 
-            int result = img.GetRectangleSum(whiteArea);
+            long result = img.GetRectangleSum(whiteArea);
 
             for(int i = 0; i < mask.blackAreas.Count; i++)
             {

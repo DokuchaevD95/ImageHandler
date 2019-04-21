@@ -73,7 +73,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             if (trainingSet.Count <= 2)
                 throw new AdaBoostException("Обучающая выборка из менее чем 2 элементов ???");
 
-            List<(TrainingObject trainingObj, int featureValue)> calculatedPairs = GetPairs(feature, trainingSet);
+            List<(TrainingObject trainingObj, long featureValue)> calculatedPairs = GetPairs(feature, trainingSet);
             (double fullPositiveSumm, double fullNegtiveSumm) = GetPosisitveAndNegativeSumms(calculatedPairs);
 
             byte sign = 0;
@@ -82,8 +82,8 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             for (int i = 1; i < calculatedPairs.Count; i++)
             {
-                (TrainingObject trainingObj, int featureValue) currPair = calculatedPairs[i];
-                (TrainingObject trainingObj, int featureValue) prevPair = calculatedPairs[i - 1];
+                (TrainingObject trainingObj, long featureValue) currPair = calculatedPairs[i];
+                (TrainingObject trainingObj, long featureValue) prevPair = calculatedPairs[i - 1];
 
                 if (currPair.trainingObj.classNumber == 1)
                     prevPositiveSumm += prevPair.trainingObj.weight;
@@ -120,7 +120,7 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <param name="feature"></param>
         /// <param name="trainingSet"></param>
         /// <returns>(объект тренировочной выборки, значение знака Хаара)</returns>
-        private static List<(TrainingObject obj, int featureValue)> GetPairs(HaarFeature feature, List<TrainingObject> trainingSet)
+        private static List<(TrainingObject obj, long featureValue)> GetPairs(HaarFeature feature, List<TrainingObject> trainingSet)
         {
             return (
                 from obj in trainingSet
@@ -135,11 +135,11 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// </summary>
         /// <param name="pairs"></param>
         /// <returns></returns>
-        private static (double positive, double negative) GetPosisitveAndNegativeSumms(List<(TrainingObject, int)> pairs)
+        private static (double positive, double negative) GetPosisitveAndNegativeSumms(List<(TrainingObject, long)> pairs)
         {
             (double, double) result = (0, 0);
 
-            foreach ((TrainingObject, int) pair in pairs)
+            foreach ((TrainingObject, long) pair in pairs)
             {
                 if (pair.Item1.classNumber == 1)
                     result.Item1 += pair.Item1.weight;
@@ -178,8 +178,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
         public int GetValue(IntegralImage img)
         {
-            int featureValue = feature.GetValue(img);
-
+            long featureValue = feature.GetValue(img);
             int result;
 
             if (treshold.sign * featureValue < treshold.sign * treshold.tresholdValue)
