@@ -14,7 +14,6 @@ namespace ImageHandler.Forms
 {
     using ImageHandler.Utils;
     using ImageHandler.Extensions;
-    using ImageHandler.Algorithms.AdaBoost;
 
     public partial class StartForm : Form
     {
@@ -23,38 +22,15 @@ namespace ImageHandler.Forms
             InitializeComponent();
         }
 
-        private void downloadFileButtton_Click(object sender, EventArgs e)
-        {
-            OpenFileDialog dialog = new OpenFileDialog();
-            dialog.ShowDialog();
-            
-            string fileName = dialog.FileName;
-            string[] splitedFileName = dialog.FileName.Split('.');
-            string extension = splitedFileName[splitedFileName.Length - 1];
-
-            if (new string[] { "png", "jpg", "bmp" }.Contains(extension))
-            {
-                Bitmap img = new Bitmap(Image.FromFile(fileName));
-                AdaBoost clf = AdaBoost.Train(1);
-                
-                string dumpName = clf.Save();
-                clf = AdaBoost.Load(dumpName);
-
-                var value = clf.Recognize(img);
-                var a = 1;
-
-                img.Show();
-            }
-            else
-            {
-                MessageBox.Show("Неверное расширение файла", "Ошибка", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
-
-        }
-
         private void StartForm_Load(object sender, EventArgs e)
         {
 
+        }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            AdaBoostForm form = new AdaBoostForm();
+            form.Show();
         }
     }
 }

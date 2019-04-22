@@ -83,6 +83,18 @@
     <Compile Include="Algorithms\AdaBoost\HaarScale.cs" />
     <Compile Include="Extensions\BitmapExtension.cs" />
     <Compile Include="Extensions\RectangleExtension.cs" />
+    <Compile Include="Forms\AdaBoostForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\AdaBoostForm.Designer.cs">
+      <DependentUpon>AdaBoostForm.cs</DependentUpon>
+    </Compile>
+    <Compile Include="Forms\InputBoxForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\InputBoxForm.Designer.cs">
+      <DependentUpon>InputBoxForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\StartForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -104,6 +116,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ScanningWindow.cs" />
     <Compile Include="Utils\TrainingImagesSet.cs" />
+    <EmbeddedResource Include="Forms\AdaBoostForm.resx">
+      <DependentUpon>AdaBoostForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\InputBoxForm.resx">
+      <DependentUpon>InputBoxForm.cs</DependentUpon>
+    </EmbeddedResource>
     <EmbeddedResource Include="Forms\StartForm.resx">
       <DependentUpon>StartForm.cs</DependentUpon>
     </EmbeddedResource>

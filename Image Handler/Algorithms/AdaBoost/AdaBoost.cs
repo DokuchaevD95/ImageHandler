@@ -206,6 +206,7 @@ namespace ImageHandler.Algorithms.AdaBoost
     public class AdaBoost
     {
         private static readonly int trainingImageSize = Convert.ToInt32(ConfigurationManager.AppSettings["AdaBoostTrainingImageSize"]);
+        private static readonly string dumpSubDirectory = ConfigurationManager.AppSettings["DumpSubDirectory"];
 
         [JsonProperty] public readonly List<WeakClassifier> weakClassifiers;
 
@@ -215,7 +216,12 @@ namespace ImageHandler.Algorithms.AdaBoost
             this.weakClassifiers = weakClassifiers;
         }
 
-        public int Recognize(Bitmap img)
+        /// <summary>
+        /// Производит распознавание объекта в прямоугольной области
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns></returns>
+        public bool Recognize(Bitmap img)
         {
             if (img.Height != trainingImageSize || img.Width != trainingImageSize)
                 img = new Bitmap(img, new Size(trainingImageSize, trainingImageSize));
@@ -229,13 +235,36 @@ namespace ImageHandler.Algorithms.AdaBoost
                 rightValue += 0.5 * Math.Log(1.0 / weakClassifier.weight);
             }
 
-            int result = leftValue >= rightValue ? 1 : 0;
+            bool result = leftValue >= rightValue ? true : false;
             return result;
+        }
+
+        /// <summary>
+        /// Производит поиск объекта согласно обученному классификатору
+        /// </summary>
+        /// <param name="src"></param>
+        /// <returns></returns>
+        public Bitmap FindObject(Bitmap src)
+        {
+            foreach (Rectangle area in new ScanningWindow(src))
+            {
+                Bitmap cropedImage = src.CropImage(area);
+                bool result = Recognize(cropedImage);
+
+                if (result)
+                {
+                    src.DrawBorder(area);
+                }
+
+                cropedImage.Dispose();
+            }
+
+            return src;
         }
 
         public string Save()
         {
-            string fileName = $"AdaBoost {DateTime.Now.ToString()}.json";
+            string fileName = $"{dumpSubDirectory}\\AdaBoost {DateTime.Now.ToString()}.json";
             fileName = fileName.Replace(':', '.');
 
             using (StreamWriter file = new StreamWriter(fileName))
@@ -248,11 +277,11 @@ namespace ImageHandler.Algorithms.AdaBoost
             return fileName;
         }
 
-        public static AdaBoost Load(string fileName)
+        public static AdaBoost Load(string filePath)
         {
             AdaBoost result;
 
-            using (StreamReader file = new StreamReader(fileName))
+            using (StreamReader file = new StreamReader(filePath))
             {
                 JsonSerializer serializer = new JsonSerializer();
                 result = (AdaBoost)serializer.Deserialize(file, typeof(AdaBoost));

@@ -23,7 +23,7 @@ namespace ImageHandler.Utils
             this.img = img;
         }
 
-        public IEnumerator<Bitmap> GetEnumerator()
+        public IEnumerator<Rectangle> GetEnumerator()
         {
             int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
 
@@ -32,9 +32,7 @@ namespace ImageHandler.Utils
                     for (int x = 0; x + currentSize < img.Width; x += step)
                     {
                         Rectangle area = new Rectangle(x, y, currentSize, currentSize);
-                        Bitmap cropedImage = img.CropImage(area);
-
-                        yield return cropedImage;
+                        yield return area;
                     }
         }
     }

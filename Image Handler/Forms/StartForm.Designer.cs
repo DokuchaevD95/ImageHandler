@@ -28,25 +28,25 @@
         /// </summary>
         private void InitializeComponent()
         {
-            this.downloadFileButton = new System.Windows.Forms.Button();
+            this.button1 = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
-            // downloadFileButton
+            // button1
             // 
-            this.downloadFileButton.Location = new System.Drawing.Point(42, 27);
-            this.downloadFileButton.Name = "downloadFileButton";
-            this.downloadFileButton.Size = new System.Drawing.Size(164, 66);
-            this.downloadFileButton.TabIndex = 0;
-            this.downloadFileButton.Text = "download";
-            this.downloadFileButton.UseVisualStyleBackColor = true;
-            this.downloadFileButton.Click += new System.EventHandler(this.downloadFileButtton_Click);
+            this.button1.Location = new System.Drawing.Point(12, 12);
+            this.button1.Name = "button1";
+            this.button1.Size = new System.Drawing.Size(125, 49);
+            this.button1.TabIndex = 0;
+            this.button1.Text = "AdaBoost";
+            this.button1.UseVisualStyleBackColor = true;
+            this.button1.Click += new System.EventHandler(this.button1_Click);
             // 
             // StartForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(383, 159);
-            this.Controls.Add(this.downloadFileButton);
+            this.ClientSize = new System.Drawing.Size(391, 173);
+            this.Controls.Add(this.button1);
             this.Name = "StartForm";
             this.Text = "Стартовое окно";
             this.Load += new System.EventHandler(this.StartForm_Load);
@@ -56,7 +56,7 @@
 
         #endregion
 
-        private System.Windows.Forms.Button downloadFileButton;
+        private System.Windows.Forms.Button button1;
     }
 }
 
