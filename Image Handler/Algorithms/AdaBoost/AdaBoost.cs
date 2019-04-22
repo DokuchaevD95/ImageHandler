@@ -223,10 +223,9 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <returns></returns>
         public bool Recognize(Bitmap img)
         {
-            if (img.Height != trainingImageSize || img.Width != trainingImageSize)
-                img = new Bitmap(img, new Size(trainingImageSize, trainingImageSize));
+            Bitmap tmpImg = new Bitmap(img, new Size(trainingImageSize, trainingImageSize));
 
-            IntegralImage integralImg = img.GetIntegralImage();
+            IntegralImage integralImg = tmpImg.GetIntegralImage();
 
             double leftValue = 0, rightValue = 0;
             foreach (WeakClassifier weakClassifier in weakClassifiers)
@@ -234,6 +233,8 @@ namespace ImageHandler.Algorithms.AdaBoost
                 leftValue += Math.Log(1.0 / weakClassifier.weight) * weakClassifier.GetValue(integralImg);
                 rightValue += 0.5 * Math.Log(1.0 / weakClassifier.weight);
             }
+
+            tmpImg.Dispose();
 
             bool result = leftValue >= rightValue ? true : false;
             return result;
@@ -251,10 +252,10 @@ namespace ImageHandler.Algorithms.AdaBoost
                 Bitmap cropedImage = src.CropImage(area);
                 bool result = Recognize(cropedImage);
 
-                if (result)
+                /*if (result)
                 {
                     src.DrawBorder(area);
-                }
+                }*/
 
                 cropedImage.Dispose();
             }

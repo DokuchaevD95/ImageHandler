@@ -32,9 +32,10 @@ namespace ImageHandler.Extensions
         public static Bitmap CropImage(this Bitmap img, Rectangle section)
         {
             Bitmap bmp = new Bitmap(section.Width, section.Height);
-            Graphics g = Graphics.FromImage(bmp);
 
+            Graphics g = Graphics.FromImage(bmp);
             g.DrawImage(img, 0, 0, section, GraphicsUnit.Pixel);
+            g.Dispose();
 
             return bmp;
         }
@@ -43,6 +44,7 @@ namespace ImageHandler.Extensions
         public static Bitmap DrawBorder(this Bitmap img, Rectangle section)
         {
             Pen pen = new Pen(Color.Red, 3);
+
             Graphics g = Graphics.FromImage(img);
             g.DrawRectangle(pen, section);
             g.Dispose();
