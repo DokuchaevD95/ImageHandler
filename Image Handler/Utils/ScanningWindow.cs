@@ -35,5 +35,21 @@ namespace ImageHandler.Utils
                         yield return area;
                     }
         }
+
+        public List<Rectangle> GetAllWindowRectangulars()
+        {
+            List<Rectangle> result = new List<Rectangle>();
+            int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
+
+            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize++)
+                for (int y = 0; y + currentSize < img.Height; y += step)
+                    for (int x = 0; x + currentSize < img.Width; x += step)
+                    {
+                        Rectangle area = new Rectangle(x, y, currentSize, currentSize);
+                        result.Add(area);
+                    }
+
+            return result;
+        }
     }
 }

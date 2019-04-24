@@ -11,15 +11,15 @@ namespace ImageHandler.Utils
 
     public class IntegralImage
     {
-        private GreyImage greyImage;
         private readonly long[,] integralImage;
 
-        public int Width { get => greyImage.Width; }
-        public int Height { get => greyImage.Height; }
+        public readonly int Width;
+        public readonly int Height;
 
         public IntegralImage(GreyImage image)
         {
-            greyImage = image;
+            Width = image.Width;
+            Height = image.Height;
             integralImage = TransformToIntegral(image);
         }
 

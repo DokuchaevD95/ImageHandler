@@ -43,7 +43,7 @@ namespace ImageHandler.Extensions
         // Выделяет границу прямоугольной области на изображении красным цветом и толщиной 3 пикселя
         public static Bitmap DrawBorder(this Bitmap img, Rectangle section)
         {
-            Pen pen = new Pen(Color.Red, 3);
+            Pen pen = new Pen(Color.Red, 1);
 
             Graphics g = Graphics.FromImage(img);
             g.DrawRectangle(pen, section);

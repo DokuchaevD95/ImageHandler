@@ -54,7 +54,7 @@ namespace ImageHandler.Forms
             DisableTrainingButtons();
 
             RunProgressBar();
-            classifier = await Task.Run(()=>AdaBoost.Train(weakClassifiersAmount));
+            classifier = await Task.Run(() => AdaBoost.Train(weakClassifiersAmount));
             StopProgressBar();
 
             loadImageButton.Enabled = true;
@@ -90,7 +90,7 @@ namespace ImageHandler.Forms
         }
 
         // Загрузить изображение
-        private void loadImageButton_Click(object sender, EventArgs e)
+        private async void loadImageButton_Click(object sender, EventArgs e)
         {
             using (OpenFileDialog dialog = new OpenFileDialog())
             {
@@ -105,9 +105,12 @@ namespace ImageHandler.Forms
                     if (new string[] { ".jpg", ".bmp", ".png" }.Contains(extension))
                     {
                         Bitmap loadedImage = new Bitmap(filePath);
-                        pictureBox1.Image = loadedImage;
 
-                        classifier.FindObject(loadedImage);
+                        RunProgressBar();
+                        Bitmap traitedImge = await Task.Run(() => classifier.FindObject(loadedImage));
+                        StopProgressBar();
+
+                        pictureBox1.Image = loadedImage;
                     }
                     else
                     {

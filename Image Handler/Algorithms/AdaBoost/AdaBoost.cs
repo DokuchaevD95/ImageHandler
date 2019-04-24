@@ -5,6 +5,7 @@ using System.IO;
 using System.Text;
 using System.Configuration;
 using System.Drawing;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 using Newtonsoft.Json;
 
@@ -51,11 +52,11 @@ namespace ImageHandler.Algorithms.AdaBoost
     [JsonObject(MemberSerialization.OptIn)]
     public class Treashold
     {
-        [JsonProperty] public byte sign;
+        [JsonProperty] public short sign;
         [JsonProperty] public double tresholdValue;
 
         [JsonConstructor]
-        public Treashold(byte sign, double tresholdValue)
+        public Treashold(short sign, double tresholdValue)
         {
             this.sign = sign;
             this.tresholdValue = tresholdValue;
@@ -76,7 +77,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             List<(TrainingObject trainingObj, long featureValue)> calculatedPairs = GetPairs(feature, trainingSet);
             (double fullPositiveSumm, double fullNegtiveSumm) = GetPosisitveAndNegativeSumms(calculatedPairs);
 
-            byte sign = 0;
+            short sign = 0;
             double minError = 1, treshold = 0;
             double prevPositiveSumm = 0, prevNegativeSumm = 0, currError, currTreshold;
 
@@ -105,7 +106,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                 currError = prevPositiveSumm + fullNegtiveSumm - prevNegativeSumm;
                 if (currError < minError)
                 {
-                    sign = 1;
+                    sign = -1;
                     minError = currError;
                     treshold = currTreshold;
                 }
@@ -234,8 +235,6 @@ namespace ImageHandler.Algorithms.AdaBoost
                 rightValue += 0.5 * Math.Log(1.0 / weakClassifier.weight);
             }
 
-            tmpImg.Dispose();
-
             bool result = leftValue >= rightValue ? true : false;
             return result;
         }
@@ -247,15 +246,17 @@ namespace ImageHandler.Algorithms.AdaBoost
         /// <returns></returns>
         public Bitmap FindObject(Bitmap src)
         {
-            foreach (Rectangle area in new ScanningWindow(src))
+            ScanningWindow scanningWindow = new ScanningWindow(src);
+
+            foreach (Rectangle area in scanningWindow)
             {
                 Bitmap cropedImage = src.CropImage(area);
                 bool result = Recognize(cropedImage);
 
-                /*if (result)
+                if (result)
                 {
                     src.DrawBorder(area);
-                }*/
+                }
 
                 cropedImage.Dispose();
             }
@@ -309,18 +310,20 @@ namespace ImageHandler.Algorithms.AdaBoost
                 WeakClassifier bestWeakClassifier = null;
                 double minimalError = 0;
 
-                foreach (HaarFeature feature in allFeatures)
-                {
-                    Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
-                    WeakClassifier wc = new WeakClassifier(feature, treshold);
-                    double wcError = wc.GetError(trainingSet);
+                // Выполняет поиск наилучшего слабого классификатора
+                // Параллельно
+                ConcurrentBag<(WeakClassifier weakClassifier, double relatedError)> bag = new ConcurrentBag<(WeakClassifier, double)>();
 
-                    if(bestWeakClassifier == null || wcError < minimalError)
-                    {
-                        bestWeakClassifier = wc;
-                        minimalError = wcError;
-                    }
-                }
+                Parallel.ForEach(allFeatures, (feature) => {
+                    Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
+                    WeakClassifier currentWeakClassifier = new WeakClassifier(feature, treshold);
+                    double currentRelatedError = currentWeakClassifier.GetError(trainingSet);
+
+                    bag.Add((currentWeakClassifier, currentRelatedError));
+                });
+                //
+
+                (bestWeakClassifier, minimalError) = bag.OrderBy((pair) => pair.relatedError).First();
 
                 bestWeakClassifier.weight = minimalError / (1.0 - minimalError);
                 result.Add(bestWeakClassifier);

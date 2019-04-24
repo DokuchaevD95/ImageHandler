@@ -14,11 +14,10 @@ namespace ImageHandler.Utils
     /// </summary>
     public class GreyImage
     {
-        private Bitmap originalImage;
         private byte[,] greyValues;
 
-        public int Width { get => originalImage.Width; }
-        public int Height { get => originalImage.Height; }
+        public readonly int Width;
+        public readonly int Height;
 
         /// <summary>
         /// преобразует матрицу значений в Bitmap
@@ -42,7 +41,8 @@ namespace ImageHandler.Utils
 
         public GreyImage(Bitmap image)
         {
-            originalImage = image;
+            Width = image.Width;
+            Height = image.Height;
             greyValues = TransformToGreyViaLockedPixels(image);
         }
 
