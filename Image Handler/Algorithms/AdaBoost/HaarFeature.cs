@@ -41,6 +41,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
                 blackArea.X = startPoint.X + blackArea.X * scale.widthMultiplier;
                 blackArea.Y = startPoint.Y + blackArea.Y * scale.heightMultiplier;
+
                 blackArea.Width *= scale.widthMultiplier;
                 blackArea.Height *= scale.heightMultiplier;
 

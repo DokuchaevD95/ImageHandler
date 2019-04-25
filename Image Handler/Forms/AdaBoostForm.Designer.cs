@@ -33,12 +33,13 @@
             this.pictureBox1 = new System.Windows.Forms.PictureBox();
             this.loadImageButton = new System.Windows.Forms.Button();
             this.progressBar1 = new System.Windows.Forms.ProgressBar();
+            this.label1 = new System.Windows.Forms.Label();
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).BeginInit();
             this.SuspendLayout();
             // 
             // trainButton
             // 
-            this.trainButton.Location = new System.Drawing.Point(12, 12);
+            this.trainButton.Location = new System.Drawing.Point(12, 53);
             this.trainButton.Name = "trainButton";
             this.trainButton.Size = new System.Drawing.Size(142, 39);
             this.trainButton.TabIndex = 0;
@@ -48,7 +49,7 @@
             // 
             // loadButton
             // 
-            this.loadButton.Location = new System.Drawing.Point(12, 57);
+            this.loadButton.Location = new System.Drawing.Point(12, 98);
             this.loadButton.Name = "loadButton";
             this.loadButton.Size = new System.Drawing.Size(144, 39);
             this.loadButton.TabIndex = 1;
@@ -78,17 +79,27 @@
             // 
             // progressBar1
             // 
-            this.progressBar1.Location = new System.Drawing.Point(12, 102);
+            this.progressBar1.Location = new System.Drawing.Point(12, 143);
             this.progressBar1.Name = "progressBar1";
             this.progressBar1.Size = new System.Drawing.Size(144, 22);
             this.progressBar1.TabIndex = 4;
             this.progressBar1.Visible = false;
+            // 
+            // label1
+            // 
+            this.label1.AutoSize = true;
+            this.label1.Location = new System.Drawing.Point(12, 12);
+            this.label1.Name = "label1";
+            this.label1.Size = new System.Drawing.Size(110, 13);
+            this.label1.TabIndex = 5;
+            this.label1.Text = "Выберите действие:";
             // 
             // AdaBoostForm
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(614, 398);
+            this.Controls.Add(this.label1);
             this.Controls.Add(this.progressBar1);
             this.Controls.Add(this.loadImageButton);
             this.Controls.Add(this.pictureBox1);
@@ -98,6 +109,7 @@
             this.Text = "AdaBoost";
             ((System.ComponentModel.ISupportInitialize)(this.pictureBox1)).EndInit();
             this.ResumeLayout(false);
+            this.PerformLayout();
 
         }
 
@@ -108,5 +120,6 @@
         private System.Windows.Forms.PictureBox pictureBox1;
         private System.Windows.Forms.Button loadImageButton;
         private System.Windows.Forms.ProgressBar progressBar1;
+        private System.Windows.Forms.Label label1;
     }
 }

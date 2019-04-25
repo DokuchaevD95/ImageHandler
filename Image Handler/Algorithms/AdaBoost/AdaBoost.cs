@@ -79,7 +79,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             short sign = 0;
             double minError = 1, treshold = 0;
-            double prevPositiveSumm = 0, prevNegativeSumm = 0, currError, currTreshold;
+            double prevPositiveSumm = 0, prevNegativeSumm = 0, currError;
 
             for (int i = 1; i < calculatedPairs.Count; i++)
             {
@@ -91,15 +91,13 @@ namespace ImageHandler.Algorithms.AdaBoost
                 else
                     prevNegativeSumm += prevPair.trainingObj.weight;
 
-                currTreshold = (prevPair.featureValue + currPair.featureValue) / 2.0;
-
                 // С положительным знаков
                 currError = prevNegativeSumm + fullPositiveSumm - prevPositiveSumm;
                 if (currError < minError)
                 {
                     sign = 1;
                     minError = currError;
-                    treshold = currTreshold;
+                    treshold = (prevPair.featureValue + currPair.featureValue) / 2.0; ;
                 }
 
                 // С отрицательным знаком
@@ -108,7 +106,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                 {
                     sign = -1;
                     minError = currError;
-                    treshold = currTreshold;
+                    treshold = (prevPair.featureValue + currPair.featureValue) / 2.0; ;
                 }
             }
 
@@ -232,10 +230,10 @@ namespace ImageHandler.Algorithms.AdaBoost
             foreach (WeakClassifier weakClassifier in weakClassifiers)
             {
                 leftValue += Math.Log(1.0 / weakClassifier.weight) * weakClassifier.GetValue(integralImg);
-                rightValue += 0.5 * Math.Log(1.0 / weakClassifier.weight);
+                rightValue += Math.Log(1.0 / weakClassifier.weight);
             }
 
-            bool result = leftValue >= rightValue ? true : false;
+            bool result = leftValue >= 0.5 * rightValue ? true : false;
             return result;
         }
 

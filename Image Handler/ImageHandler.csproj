@@ -175,6 +175,11 @@
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_10.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_11.txt" />
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_12.txt" />
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_13.txt" />
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_14.txt" />
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_15.txt" />
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_2.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>

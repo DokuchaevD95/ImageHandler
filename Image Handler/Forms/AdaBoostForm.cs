@@ -6,6 +6,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.IO;
+using System.Diagnostics;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using System.Configuration;
@@ -53,9 +54,16 @@ namespace ImageHandler.Forms
 
             DisableTrainingButtons();
 
+            Stopwatch watch = new Stopwatch();
+
             RunProgressBar();
+            watch.Start();
             classifier = await Task.Run(() => AdaBoost.Train(weakClassifiersAmount));
+            watch.Stop();
             StopProgressBar();
+
+            TimeSpan span = watch.Elapsed;
+            label1.Text = $"Процесс поиска занял: {span.Hours}:{span.Minutes}:{span.Seconds}";
 
             loadImageButton.Enabled = true;
             classifier.Save();
@@ -106,9 +114,16 @@ namespace ImageHandler.Forms
                     {
                         Bitmap loadedImage = new Bitmap(filePath);
 
+                        Stopwatch watch = new Stopwatch();
+
                         RunProgressBar();
+                        watch.Start();
                         Bitmap traitedImge = await Task.Run(() => classifier.FindObject(loadedImage));
+                        watch.Stop();
                         StopProgressBar();
+
+                        TimeSpan span = watch.Elapsed;
+                        label1.Text = $"Процесс поиска занял: {span.Hours}:{span.Minutes}:{span.Seconds}";
 
                         pictureBox1.Image = loadedImage;
                     }
@@ -119,6 +134,5 @@ namespace ImageHandler.Forms
                 }
             }
         }
-
     }
 }

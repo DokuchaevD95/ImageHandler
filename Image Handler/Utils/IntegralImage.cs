@@ -42,7 +42,10 @@ namespace ImageHandler.Utils
             if (r.X != 0 && r.Y != 0)
             {
                 Point leftTop = r.LeftTop(), leftBottom = r.LeftBottom(), rightTop = r.RightTop();
-                result -= (integralImage[leftBottom.X - 1, leftBottom.Y] + integralImage[rightTop.X, rightTop.Y - 1] - integralImage[rightTop.X - 1, rightTop.Y - 1]);
+
+                result -= integralImage[leftBottom.X - 1, leftBottom.Y];
+                result -= integralImage[rightTop.X, rightTop.Y - 1];
+                result += integralImage[leftTop.X - 1, leftTop.Y - 1];
             }
             else if (r.X != 0)
             {
