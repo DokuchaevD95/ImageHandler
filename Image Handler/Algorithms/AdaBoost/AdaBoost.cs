@@ -126,7 +126,7 @@ namespace ImageHandler.Algorithms.AdaBoost
                 let featureValue = feature.GetValue(obj.img)
                 orderby featureValue
                 select (obj, featureValue)
-            ).AsParallel().ToList();
+            ).ToList();
         }
 
         /// <summary>
@@ -158,21 +158,22 @@ namespace ImageHandler.Algorithms.AdaBoost
     {
         [JsonProperty] public readonly HaarFeature feature;
         [JsonProperty] public readonly Treashold treshold;
-        [JsonProperty] public double weight;
+        [JsonProperty] public double beta;
+        public double alpha { get => Math.Log(1.0 / beta); }
 
         [JsonConstructor]
-        public WeakClassifier(HaarFeature feature, Treashold treshold, double weight)
+        public WeakClassifier(HaarFeature feature, Treashold treshold, double beta)
         {
             this.feature = feature;
             this.treshold = treshold;
-            this.weight = weight;
+            this.beta = beta;
         }
 
         public WeakClassifier(HaarFeature feature, Treashold treshold)
         {
             this.feature = feature;
             this.treshold = treshold;
-            this.weight = 0;
+            this.beta = 0;
         }
 
         public int GetValue(IntegralImage img)
@@ -194,7 +195,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             foreach (TrainingObject obj in trainingSet)
             {
-                result += (double)(obj.weight * Math.Abs(GetValue(obj.img) - obj.classNumber));
+                result += obj.weight * Math.Abs(GetValue(obj.img) - obj.classNumber);
             }
 
             return result;
@@ -229,8 +230,8 @@ namespace ImageHandler.Algorithms.AdaBoost
             double leftValue = 0, rightValue = 0;
             foreach (WeakClassifier weakClassifier in weakClassifiers)
             {
-                leftValue += Math.Log(1.0 / weakClassifier.weight) * weakClassifier.GetValue(integralImg);
-                rightValue += Math.Log(1.0 / weakClassifier.weight);
+                leftValue += weakClassifier.alpha * weakClassifier.GetValue(integralImg);
+                rightValue += weakClassifier.alpha;
             }
 
             bool result = leftValue >= 0.5 * rightValue ? true : false;
@@ -245,49 +246,34 @@ namespace ImageHandler.Algorithms.AdaBoost
         public Bitmap FindObject(Bitmap src)
         {
             ScanningWindow scanningWindow = new ScanningWindow(src);
+            List<Rectangle> activatedAreas = new List<Rectangle>();
 
             foreach (Rectangle area in scanningWindow)
             {
-                Bitmap cropedImage = src.CropImage(area);
-                bool result = Recognize(cropedImage);
-
-                if (result)
+                using (Bitmap cropedImage = src.CropImage(area))
                 {
-                    src.DrawBorder(area);
+                    bool result = Recognize(cropedImage);
+
+                    if (result)
+                        activatedAreas.Add(area);
                 }
-
-                cropedImage.Dispose();
             }
 
+            /*
+            List<Cluster> activatedAreaClusters = RectangleClusterization.GetClusters(activatedAreas);
+
+            if (activatedAreaClusters.Count > 0)
+                foreach(Cluster cluster in activatedAreaClusters)
+                {
+                    Rectangle center = cluster.Center;
+                    src.DrawBorder(center);
+                }
+            */
+            
+            foreach (Rectangle area in activatedAreas)
+                src.DrawBorder(area);
+                
             return src;
-        }
-
-        public string Save()
-        {
-            string fileName = $"{dumpSubDirectory}\\AdaBoost {DateTime.Now.ToString()}.json";
-            fileName = fileName.Replace(':', '.');
-
-            using (StreamWriter file = new StreamWriter(fileName))
-            using (JsonWriter writer = new JsonTextWriter(file))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                serializer.Serialize(writer, this);
-            }
-
-            return fileName;
-        }
-
-        public static AdaBoost Load(string filePath)
-        {
-            AdaBoost result;
-
-            using (StreamReader file = new StreamReader(filePath))
-            {
-                JsonSerializer serializer = new JsonSerializer();
-                result = (AdaBoost)serializer.Deserialize(file, typeof(AdaBoost));
-            }
-
-            return result;
         }
 
         /// <summary>
@@ -323,7 +309,7 @@ namespace ImageHandler.Algorithms.AdaBoost
 
                 (bestWeakClassifier, minimalError) = bag.OrderBy((pair) => pair.relatedError).First();
 
-                bestWeakClassifier.weight = minimalError / (1.0 - minimalError);
+                bestWeakClassifier.beta = minimalError / (1.0 - minimalError);
                 result.Add(bestWeakClassifier);
 
                 trainingSet = UpdateWeights(trainingSet, bestWeakClassifier);
@@ -365,7 +351,8 @@ namespace ImageHandler.Algorithms.AdaBoost
             foreach (TrainingObject item in trainingSet)
                 summ += item.weight;
 
-            trainingSet.ForEach(item => item.weight = item.weight / summ);
+            foreach (TrainingObject item in trainingSet)
+                item.weight /= summ;
 
             return trainingSet;
         }
@@ -382,7 +369,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             foreach (TrainingObject obj in trainingSet)
             {
                 int degree = Math.Abs(weakClassifier.GetValue(obj.img) - obj.classNumber);
-                double multiplier = Math.Pow(weakClassifier.weight, 1 - degree);
+                double multiplier = Math.Pow(weakClassifier.beta, 1 - degree);
 
                 obj.weight *= multiplier;
             }
@@ -400,11 +387,48 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             int trueAmount = TrainingImagesSet.CountTrue;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetTrueSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 1, 1.0 / 2.0 * trueAmount));
+                result.Add(new TrainingObject(trainingImage, 1, 1.0 / (2.0 * trueAmount)));
 
             int falseAmount = TrainingImagesSet.CountFalse;
             foreach (Bitmap trainingImage in TrainingImagesSet.GetFalseSet(trainingImageSize))
-                result.Add(new TrainingObject(trainingImage, 0, 1.0 / 2.0 * falseAmount));
+                result.Add(new TrainingObject(trainingImage, 0, 1.0 / (2.0 * falseAmount)));
+
+            return result;
+        }
+
+        /// <summary>
+        /// Выгрузка в JSON
+        /// </summary>
+        /// <returns></returns>
+        public string Save()
+        {
+            string fileName = $"{dumpSubDirectory}\\AdaBoost {DateTime.Now.ToString()}.json";
+            fileName = fileName.Replace(':', '.');
+
+            using (StreamWriter file = new StreamWriter(fileName))
+            using (JsonWriter writer = new JsonTextWriter(file))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(writer, this);
+            }
+
+            return fileName;
+        }
+
+        /// <summary>
+        /// Загрузка из JSON
+        /// </summary>
+        /// <param name="filePath"></param>
+        /// <returns></returns>
+        public static AdaBoost Load(string filePath)
+        {
+            AdaBoost result;
+
+            using (StreamReader file = new StreamReader(filePath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                result = (AdaBoost)serializer.Deserialize(file, typeof(AdaBoost));
+            }
 
             return result;
         }

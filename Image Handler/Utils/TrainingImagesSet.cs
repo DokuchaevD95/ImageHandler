@@ -9,6 +9,8 @@ using System.Drawing;
 
 namespace ImageHandler.Utils
 {
+    using ImageHandler.Extensions;
+
     class TrainingImagesSet
     {
         public static string trueSetPath = ConfigurationManager.AppSettings["TrueSetPath"];
@@ -44,7 +46,7 @@ namespace ImageHandler.Utils
                 throw new DirectoryNotFoundException("Папка с обучающей выборкой не найдена (true набор)");
 
             List<Bitmap> result = new List<Bitmap>();
-            
+
             foreach(string fileName in Directory.GetFiles(trueSetPath))
             {
                 Bitmap downloadedImage = new Bitmap(Image.FromFile(fileName), size, size);

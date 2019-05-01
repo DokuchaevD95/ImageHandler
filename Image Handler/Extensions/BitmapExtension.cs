@@ -31,13 +31,12 @@ namespace ImageHandler.Extensions
         // вырезает прямоугольник из изображения
         public static Bitmap CropImage(this Bitmap img, Rectangle section)
         {
-            Bitmap bmp = new Bitmap(section.Width, section.Height);
+            Bitmap result = new Bitmap(section.Width, section.Height);
 
-            Graphics g = Graphics.FromImage(bmp);
-            g.DrawImage(img, 0, 0, section, GraphicsUnit.Pixel);
-            g.Dispose();
+            using (Graphics g = Graphics.FromImage(result))
+                g.DrawImage(img, 0, 0, section, GraphicsUnit.Pixel);
 
-            return bmp;
+            return result;
         }
 
         // Выделяет границу прямоугольной области на изображении красным цветом и толщиной 3 пикселя
@@ -45,9 +44,8 @@ namespace ImageHandler.Extensions
         {
             Pen pen = new Pen(Color.Red, 1);
 
-            Graphics g = Graphics.FromImage(img);
-            g.DrawRectangle(pen, section);
-            g.Dispose();
+            using (Graphics g = Graphics.FromImage(img))
+                g.DrawRectangle(pen, section);
 
             return img;
         }

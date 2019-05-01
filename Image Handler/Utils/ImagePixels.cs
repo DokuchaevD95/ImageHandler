@@ -49,7 +49,7 @@ namespace ImageHandler.Utils
         {
             image = img;
             rectArea = new Rectangle(0, 0, image.Width, image.Height);
-            bmpData = image.LockBits(rectArea, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            bmpData = image.LockBits(rectArea, ImageLockMode.WriteOnly, img.PixelFormat);
             InitPixelMatrix();
         }
 
@@ -57,7 +57,7 @@ namespace ImageHandler.Utils
         {
             image = img;
             rectArea = rect;
-            bmpData = image.LockBits(rectArea, ImageLockMode.ReadWrite, PixelFormat.Format24bppRgb);
+            bmpData = image.LockBits(rectArea, ImageLockMode.WriteOnly, img.PixelFormat);
             InitPixelMatrix();
         }
 
@@ -79,7 +79,6 @@ namespace ImageHandler.Utils
             unsafe
             {
                 byte* firstPixelPtr = (byte*)bmpData.Scan0;
-
                 pixelMatrix = new Pixel[rectArea.Width, rectArea.Height];
 
                 for (int y = 0; y < rectArea.Height; y++)
@@ -91,44 +90,12 @@ namespace ImageHandler.Utils
                         byte* currentPixelPtr = currentLine + ((rectArea.X + x) * componentsAmount);
 
                         pixelMatrix[x, y] = new Pixel(
-                            r: currentPixelPtr[2], // B
-                            g: currentPixelPtr[1], // G
-                            b: currentPixelPtr[0] // R
+                            r: currentPixelPtr[2],
+                            g: currentPixelPtr[1],
+                            b: currentPixelPtr[0] 
                         );
                     }
                 }
-            }
-
-            return pixelMatrix;
-        }
-
-        /// <summary>
-        /// Сохраняет изменения и разблокирует пиксели
-        /// </summary>
-        /// <returns></returns>
-        private Pixel[,] SaveAndUnlockPixelsParallel()
-        {
-            unsafe
-            {
-                byte* firstPixelPtr = (byte*)bmpData.Scan0;
-
-                for (int y = 0; y < rectArea.Height; y++)
-                { 
-                    byte* currentLine = firstPixelPtr + ((rectArea.Y + y) * bmpData.Stride);
-
-                    for (int x = 0; x < rectArea.Width; x++)
-                    {
-                        byte* currentPixelPtr = currentLine + ((rectArea.X + x) * componentsAmount);
-
-                        pixelMatrix[x, y] = new Pixel(
-                            r: currentPixelPtr[2], // B
-                            g: currentPixelPtr[1], // G
-                            b: currentPixelPtr[0] // R
-                        );
-                    }
-                }
-
-                image.UnlockBits(bmpData);
             }
 
             return pixelMatrix;
@@ -147,7 +114,7 @@ namespace ImageHandler.Utils
                 if (disposing)
                 {
                     // освобождение управляемых ресурсов
-                    SaveAndUnlockPixelsParallel();
+                    image.UnlockBits(bmpData);
                 }
                 // освобождение неуправляемых ресурсов
                 disposed = true;

@@ -28,6 +28,8 @@
     <UseApplicationTrust>false</UseApplicationTrust>
     <BootstrapperEnabled>true</BootstrapperEnabled>
     <TargetFrameworkProfile />
+    <NuGetPackageImportStamp>
+    </NuGetPackageImportStamp>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -108,6 +110,7 @@
       <DependentUpon>ImageForm.cs</DependentUpon>
     </Compile>
     <Compile Include="Algorithms\AdaBoost\HaarMask.cs" />
+    <Compile Include="Utils\RectangleClusterization.cs" />
     <Compile Include="Utils\ConsoleUtil.cs" />
     <Compile Include="Utils\GreyImage.cs" />
     <Compile Include="Utils\ImagePixels.cs" />

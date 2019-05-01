@@ -118,7 +118,7 @@ namespace ImageHandler.Forms
 
                         RunProgressBar();
                         watch.Start();
-                        Bitmap traitedImge = await Task.Run(() => classifier.FindObject(loadedImage));
+                        Bitmap traitedImage = await Task.Run(() => classifier.FindObject(loadedImage));
                         watch.Stop();
                         StopProgressBar();
 
