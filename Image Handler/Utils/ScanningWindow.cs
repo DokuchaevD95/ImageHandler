@@ -27,7 +27,7 @@ namespace ImageHandler.Utils
         {
             int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
 
-            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize++)
+            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize += step)
                 for (int y = 0; y + currentSize < img.Height; y += step)
                     for (int x = 0; x + currentSize < img.Width; x += step)
                     {
@@ -41,7 +41,7 @@ namespace ImageHandler.Utils
             List<Rectangle> result = new List<Rectangle>();
             int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
 
-            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize++)
+            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize += step)
                 for (int y = 0; y + currentSize < img.Height; y += step)
                     for (int x = 0; x + currentSize < img.Width; x += step)
                     {

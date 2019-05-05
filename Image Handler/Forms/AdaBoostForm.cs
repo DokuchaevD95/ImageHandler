@@ -134,5 +134,19 @@ namespace ImageHandler.Forms
                 }
             }
         }
+
+        private void button1_Click(object sender, EventArgs e)
+        {
+            var set = TrainingImagesSet.GetTrueSet(30);
+
+            int count = 3;
+            foreach (Bitmap img in set)
+            {
+                if (count-- > 0)
+                    img.GetGreyImage().ToBitmap().Show();
+
+                else break;
+            }
+        }
     }
 }

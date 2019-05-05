@@ -14,30 +14,10 @@ namespace ImageHandler.Utils
     /// </summary>
     public class GreyImage
     {
-        private byte[,] greyValues;
+        public byte[,] greyValues;
 
         public readonly int Width;
         public readonly int Height;
-
-        /// <summary>
-        /// преобразует матрицу значений в Bitmap
-        /// </summary>
-        public Bitmap AsBitmap
-        {
-            get
-            {
-                Bitmap bmp = new Bitmap(Width, Height);
-
-                for (int x = 0; x < Width; x++)
-                    for (int y = 0; y < Height; y++)
-                    {
-                        byte currentValue = greyValues[x, y];
-                        bmp.SetPixel(x, y, Color.FromArgb(255, currentValue, currentValue, currentValue));
-                    }
-
-                return bmp;
-            }
-        }
 
         public GreyImage(Bitmap image)
         {
@@ -46,9 +26,17 @@ namespace ImageHandler.Utils
             greyValues = TransformToGreyViaLockedPixels(image);
         }
 
-        public byte GetValue(int x, int y)
+        public byte this[int x, int y]
         {
-            return greyValues[x, y];
+            get
+            {
+                return greyValues[x, y];
+            }
+
+            set
+            {
+                greyValues[x, y] = value;
+            }
         }
 
         /// <summary>
@@ -90,5 +78,84 @@ namespace ImageHandler.Utils
 
             return gray;
         }
+
+
+        /// <summary>
+        /// преобразует матрицу значений в Bitmap
+        /// </summary>
+        public Bitmap ToBitmap()
+        {
+            Bitmap bmp = new Bitmap(Width, Height);
+
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                {
+                    byte currentValue = greyValues[x, y];
+                    bmp.SetPixel(x, y, Color.FromArgb(255, currentValue, currentValue, currentValue));
+                }
+
+            return bmp;
+        }
+
+        /*
+        public GreyImage Convolute()
+        {
+            const int maskSize = 3;
+
+            // Маска оператора Собеля
+            short[,] gxMask = new short[maskSize, maskSize] { 
+                { -1, 0, 1 },
+                { -2, 0, 2 },
+                { -1, 0, 1 }
+            };
+
+            short[,] gyMask = new short[maskSize, maskSize] {
+                { -1, -2, -1 },
+                { 0, 0, 0 },
+                { 1, 2, 1 }
+            };
+
+            byte[,] gradientMatrix = new byte[Width, Height];
+
+            for (int x = 0; x < Width; x++)
+                for (int y = 0; y < Height; y++)
+                {
+                    byte[,] cropingResult = CropMatrix(new Point(x, y), maskSize);
+                    
+                    int gxValue = ImposeMask(cropingResult, gxMask, maskSize);
+                    int gyValue = ImposeMask(cropingResult, gyMask, maskSize);
+
+                    int gradientValue = (int)Math.Sqrt(gxValue * gxValue + gyValue * gyValue);
+                    gradientMatrix[x, y] = (byte)(0.5 * gradientValue);
+                }
+            greyValues = gradientMatrix;
+
+            return this;
+        }
+
+        private static int ImposeMask(byte[,] imgComponent, short[,] mask, int size)
+        {
+            int result = 0;
+
+            for (int x = 0; x < size; x++)
+                for(int y = 0; y < size; y++)
+                    result += mask[x, y] * imgComponent[x, y];
+
+            return result;
+        }
+
+        private byte[,] CropMatrix(Point center, int size)
+        {
+            byte[,] result = new byte[size, size];
+            int halfSize = size / 2;
+
+            for (int x = center.X - halfSize, cropX = 0; x <= center.X + halfSize; x++, cropX++)
+                for (int y = center.Y - halfSize, cropY = 0; y <= center.Y + halfSize; y++, cropY++)
+                    if (x >= 0 && x < Width && y >= 0 && y < Height)
+                        result[cropX, cropY] = this[x, y];
+
+            return result;
+        }
+        */
     }
 }

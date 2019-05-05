@@ -2,7 +2,6 @@
 using System.IO;
 using System.Linq;
 using System.Drawing;
-using System.Security.Cryptography;
 using System.Windows.Forms;
 using Newtonsoft.Json;
 using System.Collections.Generic;

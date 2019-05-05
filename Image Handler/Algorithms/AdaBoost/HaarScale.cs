@@ -11,7 +11,7 @@ namespace ImageHandler.Algorithms.AdaBoost
     /// Класс для хранения коэффициентов скалирования признака Хаара
     /// </summary>
     [JsonObject(MemberSerialization.OptIn)]
-    public class HaarScale
+    public struct HaarScale
     {
         [JsonProperty] public readonly int widthMultiplier;
         [JsonProperty] public readonly int heightMultiplier;

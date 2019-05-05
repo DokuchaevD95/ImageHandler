@@ -61,6 +61,7 @@
     <ApplicationManifest>Properties\app.manifest</ApplicationManifest>
   </PropertyGroup>
   <ItemGroup>
+    <Reference Include="FSharp.Core, Version=4.5.0.0, Culture=neutral, PublicKeyToken=b03f5f7f11d50a3a, processorArchitecture=MSIL" />
     <Reference Include="Newtonsoft.Json, Version=12.0.0.0, Culture=neutral, PublicKeyToken=30ad4fe6b2a6aeed, processorArchitecture=MSIL">
       <HintPath>..\packages\Newtonsoft.Json.12.0.1\lib\net45\Newtonsoft.Json.dll</HintPath>
     </Reference>
@@ -80,9 +81,13 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Algorithms\AdaBoost\AdaBoost.cs" />
+    <Compile Include="Algorithms\AdaBoost\Cascade.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarFeature.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarMaskTemplates.cs" />
     <Compile Include="Algorithms\AdaBoost\HaarScale.cs" />
+    <Compile Include="Algorithms\AdaBoost\TrainingObject.cs" />
+    <Compile Include="Algorithms\AdaBoost\Treashold.cs" />
+    <Compile Include="Algorithms\AdaBoost\WeakClassifier.cs" />
     <Compile Include="Extensions\BitmapExtension.cs" />
     <Compile Include="Extensions\RectangleExtension.cs" />
     <Compile Include="Forms\AdaBoostForm.cs">
@@ -178,12 +183,37 @@
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_10.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_11.txt" />
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_12.txt" />
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_13.txt" />
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_14.txt" />
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_15.txt" />
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_11.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_12.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_13.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_14.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_15.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_16.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_17.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_18.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_19.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_2.txt">
+      <CopyToOutputDirectory>Always</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_20.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_3.txt">

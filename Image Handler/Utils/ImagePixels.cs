@@ -35,8 +35,7 @@ namespace ImageHandler.Utils
     /// </summary>
     public class ImagePixels: IDisposable
     {
-        public static PixelFormat pixelformat = PixelFormat.Format24bppRgb;
-        public static int componentsAmount = Bitmap.GetPixelFormatSize(pixelformat) / 8;
+        public int componentsAmount;
 
         private bool disposed;
 
@@ -49,6 +48,7 @@ namespace ImageHandler.Utils
         {
             image = img;
             rectArea = new Rectangle(0, 0, image.Width, image.Height);
+            componentsAmount = Image.GetPixelFormatSize(img.PixelFormat) / 8;
             bmpData = image.LockBits(rectArea, ImageLockMode.WriteOnly, img.PixelFormat);
             InitPixelMatrix();
         }
@@ -57,6 +57,7 @@ namespace ImageHandler.Utils
         {
             image = img;
             rectArea = rect;
+            componentsAmount = Image.GetPixelFormatSize(img.PixelFormat);
             bmpData = image.LockBits(rectArea, ImageLockMode.WriteOnly, img.PixelFormat);
             InitPixelMatrix();
         }

@@ -11,7 +11,7 @@ namespace ImageHandler.Utils
 
     public class IntegralImage
     {
-        private readonly long[,] integralImage;
+        public readonly long[,] integralImage;
 
         public readonly int Width;
         public readonly int Height;
@@ -101,7 +101,7 @@ namespace ImageHandler.Utils
                     long leftSum = x != 0 ? result[x - 1, y] : 0;
                     long topSum = y != 0 ? result[x, y - 1] : 0;
 
-                    result[x, y] = image.GetValue(x, y) + leftSum + topSum - digonalSum;
+                    result[x, y] = image[x, y] + leftSum + topSum - digonalSum;
                 }
 
             return result;
