@@ -15,12 +15,13 @@ namespace ImageHandler.Forms
         {
             InitializeComponent();
         }
-        public static string Show(string inputBoxText)
+        public static T Show<T>(string inputBoxText, Func<string, T> converter)
         {
             newInputBoxForm = new InputBoxForm();
             newInputBoxForm.titleLabel.Text = inputBoxText;
             newInputBoxForm.ShowDialog();
-            return returnValue;
+
+            return converter(returnValue);
         }
 
         private void okButton_Click(object sender, EventArgs e)

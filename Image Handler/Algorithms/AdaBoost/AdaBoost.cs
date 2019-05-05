@@ -33,6 +33,12 @@ namespace ImageHandler.Algorithms.AdaBoost
             this.weakClassifiers = weakClassifiers;
         }
 
+        public double GetStrongTreashold()
+        {
+            double alphaSum = weakClassifiers.Select(item => item.GetAlpha()).Sum();
+            return 0.5 * alphaSum;
+        }
+
         /// <summary>
         /// Производит распознавание объекта в прямоугольной области
         /// </summary>
@@ -47,8 +53,8 @@ namespace ImageHandler.Algorithms.AdaBoost
             double leftValue = 0, rightValue = 0;
             foreach (WeakClassifier weakClassifier in weakClassifiers)
             {
-                leftValue += weakClassifier.alpha * weakClassifier.GetValue(integralImg);
-                rightValue += weakClassifier.alpha;
+                leftValue += weakClassifier.GetAlpha() * weakClassifier.GetValue(integralImg);
+                rightValue += weakClassifier.GetAlpha();
             }
 
             bool result = leftValue >= 0.5 * rightValue ? true : false;
@@ -107,28 +113,7 @@ namespace ImageHandler.Algorithms.AdaBoost
             for (int i = 0; i < featuresAmount; i++)
             {
                 trainingSet = NormlizeWeights(trainingSet);
-
-                WeakClassifier bestWeakClassifier = null;
-                double minimalError = 0;
-
-                // Выполняет поиск наилучшего слабого классификатора
-                // Параллельно
-                ConcurrentBag<(WeakClassifier weakClassifier, double relatedError)> bag = new ConcurrentBag<(WeakClassifier, double)>();
-
-                Parallel.ForEach(allFeatures, (feature) => {
-                    Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
-                    WeakClassifier currentWeakClassifier = new WeakClassifier(feature, treshold);
-                    double currentRelatedError = currentWeakClassifier.GetError(trainingSet);
-
-                    bag.Add((currentWeakClassifier, currentRelatedError));
-                });
-                //
-
-                (bestWeakClassifier, minimalError) = bag.OrderBy((pair) => pair.relatedError).First();
-
-                bestWeakClassifier.beta = minimalError / (1.0 - minimalError);
-                result.Add(bestWeakClassifier);
-
+                WeakClassifier bestWeakClassifier = WeakClassifier.GetBestWeakClassifier(allFeatures, trainingSet);
                 trainingSet = UpdateWeights(trainingSet, bestWeakClassifier);
             }
 

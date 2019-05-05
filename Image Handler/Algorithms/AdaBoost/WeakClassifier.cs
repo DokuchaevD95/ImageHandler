@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using Newtonsoft.Json;
+using System.Collections.Concurrent;
 using System.Threading.Tasks;
 
 namespace ImageHandler.Algorithms.AdaBoost
@@ -18,7 +19,6 @@ namespace ImageHandler.Algorithms.AdaBoost
         [JsonProperty] public readonly HaarFeature feature;
         [JsonProperty] public readonly Treashold treshold;
         [JsonProperty] public double beta;
-        public double alpha { get => Math.Log10(1.0 / beta); }
 
         [JsonConstructor]
         public WeakClassifier(HaarFeature feature, Treashold treshold, double beta)
@@ -33,6 +33,11 @@ namespace ImageHandler.Algorithms.AdaBoost
             this.feature = feature;
             this.treshold = treshold;
             this.beta = 0;
+        }
+
+        public double GetAlpha()
+        {
+            return Math.Log10(1.0 / beta);
         }
 
         public int GetValue(IntegralImage img)
@@ -58,6 +63,29 @@ namespace ImageHandler.Algorithms.AdaBoost
             }
 
             return result;
+        }
+
+        public static WeakClassifier GetBestWeakClassifier(List<HaarFeature> allFeatures, List<TrainingObject> trainingSet)
+        {
+            double minimalError = 0;
+            WeakClassifier bestWeakClassifier = null;
+
+            ConcurrentBag<(WeakClassifier weakClassifier, double relatedError)> bag = new ConcurrentBag<(WeakClassifier, double)>();
+
+            Parallel.ForEach(allFeatures, (feature) => {
+                Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
+                WeakClassifier currentWeakClassifier = new WeakClassifier(feature, treshold);
+                double currentRelatedError = currentWeakClassifier.GetError(trainingSet);
+
+                bag.Add((currentWeakClassifier, currentRelatedError));
+            });
+            //
+
+            (bestWeakClassifier, minimalError) = bag.OrderBy((pair) => pair.relatedError).First();
+
+            bestWeakClassifier.beta = minimalError / (1.0 - minimalError);
+
+            return bestWeakClassifier;
         }
     }
 

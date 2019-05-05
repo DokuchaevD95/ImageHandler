@@ -96,6 +96,12 @@
     <Compile Include="Forms\AdaBoostForm.Designer.cs">
       <DependentUpon>AdaBoostForm.cs</DependentUpon>
     </Compile>
+    <Compile Include="Forms\CascadeForm.cs">
+      <SubType>Form</SubType>
+    </Compile>
+    <Compile Include="Forms\CascadeForm.Designer.cs">
+      <DependentUpon>CascadeForm.cs</DependentUpon>
+    </Compile>
     <Compile Include="Forms\InputBoxForm.cs">
       <SubType>Form</SubType>
     </Compile>
@@ -126,6 +132,9 @@
     <Compile Include="Utils\TrainingImagesSet.cs" />
     <EmbeddedResource Include="Forms\AdaBoostForm.resx">
       <DependentUpon>AdaBoostForm.cs</DependentUpon>
+    </EmbeddedResource>
+    <EmbeddedResource Include="Forms\CascadeForm.resx">
+      <DependentUpon>CascadeForm.cs</DependentUpon>
     </EmbeddedResource>
     <EmbeddedResource Include="Forms\InputBoxForm.resx">
       <DependentUpon>InputBoxForm.cs</DependentUpon>
