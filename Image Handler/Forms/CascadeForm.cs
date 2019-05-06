@@ -64,12 +64,18 @@ namespace ImageHandler.Forms
 
                         RunProgressBar();
                         watch.Start();
-                        // Bitmap traitedImage = await Task.Run(() => classifier.FindObject(loadedImage));
+                        bool recognitionResult = await Task.Run(() => classifier.Recognize(loadedImage));
                         watch.Stop();
                         StopProgressBar();
 
+                        if (recognitionResult)
+                            label1.Text = "Объект присутствует";
+                        else label1.Text = "Объект отсутствует";
+
+                        /*
                         TimeSpan span = watch.Elapsed;
                         label1.Text = $"Процесс поиска занял: {span.Hours}:{span.Minutes}:{span.Seconds}";
+                        */
 
                         pictureBox1.Image = loadedImage;
                     }

@@ -33,12 +33,6 @@ namespace ImageHandler.Algorithms.AdaBoost
             this.weakClassifiers = weakClassifiers;
         }
 
-        public double GetStrongTreashold()
-        {
-            double alphaSum = weakClassifiers.Select(item => item.GetAlpha()).Sum();
-            return 0.5 * alphaSum;
-        }
-
         /// <summary>
         /// Производит распознавание объекта в прямоугольной области
         /// </summary>

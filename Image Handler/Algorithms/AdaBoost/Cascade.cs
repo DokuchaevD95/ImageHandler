@@ -11,6 +11,7 @@ using System.Threading.Tasks;
 namespace ImageHandler.Algorithms.AdaBoost
 {
     using ImageHandler.Utils;
+    using ImageHandler.Extensions;
 
     class CascadeException : Exception
     {
@@ -23,30 +24,13 @@ namespace ImageHandler.Algorithms.AdaBoost
     [JsonObject(MemberSerialization.OptIn)]
     public class CascadeStage
     {
-        [JsonProperty] public readonly AdaBoost strongClassifier;
+        [JsonProperty] public readonly List<WeakClassifier> weakClassifiers;
         [JsonProperty] public double strongTreashold;
 
         public CascadeStage(List<WeakClassifier> weakClassifiers, double strongTreashold)
         {
-            strongClassifier = new AdaBoost(weakClassifiers);
+            this.weakClassifiers = weakClassifiers;
             this.strongTreashold = strongTreashold;
-        }
-
-        public CascadeStage(List<WeakClassifier> weakClassifiers)
-        {
-            strongClassifier = new AdaBoost(weakClassifiers);
-            strongTreashold = strongClassifier.GetStrongTreashold();
-        }
-    
-        public bool GetStageValue(IntegralImage img)
-        {
-            double leftValue = 0, rightValue = 0;
-            foreach (WeakClassifier weakClassifier in strongClassifier.weakClassifiers)
-                leftValue += weakClassifier.GetAlpha() * weakClassifier.GetValue(img);
-
-            bool result = leftValue >= strongTreashold ? true : false;
-
-            return result;
         }
     }
 
@@ -60,16 +44,40 @@ namespace ImageHandler.Algorithms.AdaBoost
         private static readonly string dumpSubDirectory = ConfigurationManager.AppSettings["DumpSubDirectory"];
 
         [JsonProperty]
-        public readonly List<CascadeStage> stages;
+        public readonly LinkedList<CascadeStage> stages;
 
         [JsonConstructor]
-        public Cascade(List<CascadeStage> stages)
+        public Cascade(LinkedList<CascadeStage> stages)
         {
             this.stages = stages;
         }
 
         /// <summary>
-        /// 
+        /// Метод по распознаванию изображения каскадом
+        /// </summary>
+        /// <param name="img"></param>
+        /// <returns></returns>
+        public bool Recognize(Bitmap img)
+        {
+            Bitmap tmpImg = new Bitmap(img, new Size(trainingImageSize, trainingImageSize));
+
+            IntegralImage integralImg = tmpImg.GetIntegralImage();
+
+            double activationValue = 0;
+            foreach (CascadeStage stage in stages)
+            {
+                foreach (WeakClassifier weakClassifier in stage.weakClassifiers)
+                    activationValue += weakClassifier.GetAlpha() * weakClassifier.GetValue(integralImg);
+
+                if (activationValue < stage.strongTreashold)
+                    return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Тренерует каскадный классификатор
         /// </summary>
         /// <param name="acceptableFeaturesAmount">Количество доступных признаков Хаара</param>
         /// <param name="acceptableFP">допустимая доля ложных позитивных срабатываний</param>
@@ -83,10 +91,10 @@ namespace ImageHandler.Algorithms.AdaBoost
 
             List<HaarFeature> haarFeatures = GetAllAvailableHaarFeatures();
 
-            List<CascadeStage> resultStages = new List<CascadeStage>();
+            List<WeakClassifier> allWeakClassifiers = new List<WeakClassifier>();
+            List<WeakClassifier> currStageWeakClassifiers = new List<WeakClassifier>();
 
-            double strongTreashold;
-            List<WeakClassifier> weakClassifiers = new List<WeakClassifier>();
+            LinkedList<CascadeStage> resultStages = new LinkedList<CascadeStage>();
 
             do
             {
@@ -96,8 +104,9 @@ namespace ImageHandler.Algorithms.AdaBoost
                 trainingSet = UpdateWeights(trainingSet, bestWeakClassifier);
 
                 // Обновление доп массива с коэффециентами распознаных изображений
-                // и вычисление порога сильного лкассификатора
-                weakClassifiers.Add(bestWeakClassifier);
+                // и вычисление порога сильного классификатора
+                allWeakClassifiers.Add(bestWeakClassifier);
+                currStageWeakClassifiers.Add(bestWeakClassifier);
                 for (int i = 0; i < positiveSet.Count; i++)
                 {
                     TrainingObject positiveImg = positiveSet[i];
@@ -105,18 +114,60 @@ namespace ImageHandler.Algorithms.AdaBoost
                     if (bestWeakClassifier.GetValue(positiveImg.img) == 1)
                         recognizedCoefficients[i] += bestWeakClassifier.GetAlpha();
                 }
-                strongTreashold = recognizedCoefficients.Min() - minSubtrahend;
+                double strongTreashold = recognizedCoefficients.Min() - minSubtrahend;
+                int currFP = GetFPAmount(allWeakClassifiers, negativeSet, strongTreashold);
 
-                CascadeStage stage = new CascadeStage(weakClassifiers, strongTreashold);
-                int FPamount = negativeSet.Where(item => stage.GetStageValue(item.img)).ToList().Count;
+                // Если количество ложных положительных срабатываний не превысило допустимое значение
+                // выносим признаки в новую стадию каскада
+                if (currFP <= (int)(acceptableFPportion * negativeSet.Count))
+                {
+                    resultStages.AddLast(new CascadeStage(currStageWeakClassifiers, strongTreashold));
+                    currStageWeakClassifiers = new List<WeakClassifier>();
+                }
+                // Если закончились признаки, но доля ложных положительных срабатываний превышена
+                // возвращаем стандартный порог сильного классификатора и завершаем процесс
+                else if (allWeakClassifiers.Count == acceptableFeaturesAmount)
+                {
+                    double defaultStrongTreshold = GetDefaultStrongTreashold(allWeakClassifiers);
+                    resultStages.AddLast(new CascadeStage(currStageWeakClassifiers, defaultStrongTreshold));
+                }
 
-                if (FPamount < acceptableFPportion * negativeSet.Count)
-                    resultStages.Add(stage);
-                else if (weakClassifiers.Count == acceptableFeaturesAmount)
-                    resultStages.Add(new CascadeStage(weakClassifiers));
-            } while (weakClassifiers.Count <= acceptableFeaturesAmount);
+            } while (allWeakClassifiers.Count < acceptableFeaturesAmount);
 
             return new Cascade(resultStages);
+        }
+
+        /// <summary>
+        /// Высчитывает количество ложных позитивных срабатываний
+        /// </summary>
+        /// <param name="weakClassifiers"></param>
+        /// <param name="negativeSet"></param>
+        /// <param name="strongTreashold"></param>
+        /// <returns></returns>
+        private static int GetFPAmount(List<WeakClassifier> weakClassifiers, List<TrainingObject> negativeSet, double strongTreashold)
+        {
+            int FP = 0;
+            foreach (TrainingObject negativeObj in negativeSet)
+            {
+                double activationValue = 0;
+                IntegralImage integralImage = negativeObj.img;
+
+                activationValue += weakClassifiers.Sum(item => item.GetValue(integralImage) * item.GetAlpha());
+
+                FP += activationValue >= strongTreashold ? 1 : 0;
+            }
+
+            return FP;
+        }
+
+        /// <summary>
+        /// Вычисляет стандартный порог сильного классиикатора
+        /// </summary>
+        /// <param name="weakClassifiers"></param>
+        /// <returns></returns>
+        private static double GetDefaultStrongTreashold(List<WeakClassifier> weakClassifiers)
+        {
+            return 0.5 * weakClassifiers.Sum(item => item.GetAlpha());
         }
 
         /// <summary>
