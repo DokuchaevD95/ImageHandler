@@ -71,19 +71,26 @@ namespace ImageHandler.Algorithms.AdaBoost
             WeakClassifier bestWeakClassifier = null;
 
             ConcurrentBag<(WeakClassifier weakClassifier, double relatedError)> bag = new ConcurrentBag<(WeakClassifier, double)>();
+            OrderablePartitioner<Tuple<int, int>> partitioner = Partitioner.Create(0, allFeatures.Count, 1000);
 
-            Parallel.ForEach(allFeatures, (feature) => {
-                Treashold treshold = Treashold.CalculateTreshold(feature, trainingSet);
-                WeakClassifier currentWeakClassifier = new WeakClassifier(feature, treshold);
-                double currentRelatedError = currentWeakClassifier.GetError(trainingSet);
+            // Вычисление лучшего классиикатора
+            Parallel.ForEach(partitioner, (range, loop) => {
+                for (int i = range.Item1; i < range.Item2; i++)
+                {
+                    Treashold treshold = Treashold.CalculateTreshold(allFeatures[i], trainingSet);
+                    WeakClassifier currentWeakClassifier = new WeakClassifier(allFeatures[i], treshold);
+                    double currentRelatedError = currentWeakClassifier.GetError(trainingSet);
+                    bag.Add((currentWeakClassifier, currentRelatedError));
+                }
 
-                bag.Add((currentWeakClassifier, currentRelatedError));
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
             });
             //
 
             (bestWeakClassifier, minimalError) = bag.OrderBy((pair) => pair.relatedError).First();
-
             bestWeakClassifier.beta = minimalError / (1.0 - minimalError);
+
 
             return bestWeakClassifier;
         }

@@ -27,13 +27,20 @@ namespace ImageHandler.Utils
         {
             int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
 
-            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize += step)
+            int currentSize = defaultSize;
+            while (currentSize < minimalImageSide)
+            {
+                int currentStep = (int)(0.25 * currentSize);
+
                 for (int y = 0; y + currentSize < img.Height; y += step)
                     for (int x = 0; x + currentSize < img.Width; x += step)
                     {
                         Rectangle area = new Rectangle(x, y, currentSize, currentSize);
                         yield return area;
                     }
+
+                currentSize = (int)(1.25 * currentSize);
+            }
         }
 
         public List<Rectangle> GetAllWindowRectangulars()
@@ -41,13 +48,20 @@ namespace ImageHandler.Utils
             List<Rectangle> result = new List<Rectangle>();
             int minimalImageSide = img.Height < img.Width ? img.Height : img.Width;
 
-            for (int currentSize = defaultSize; currentSize < minimalImageSide; currentSize += step)
+            int currentSize = defaultSize;
+            while (currentSize < minimalImageSide)
+            {
+                int currentStep = (int)(0.25 * currentSize);
+
                 for (int y = 0; y + currentSize < img.Height; y += step)
                     for (int x = 0; x + currentSize < img.Width; x += step)
                     {
                         Rectangle area = new Rectangle(x, y, currentSize, currentSize);
                         result.Add(area);
                     }
+
+                currentSize = (int)(1.25 * currentSize);
+            }
 
             return result;
         }

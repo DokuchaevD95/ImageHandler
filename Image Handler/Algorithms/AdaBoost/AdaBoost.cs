@@ -109,6 +109,8 @@ namespace ImageHandler.Algorithms.AdaBoost
                 trainingSet = NormlizeWeights(trainingSet);
                 WeakClassifier bestWeakClassifier = WeakClassifier.GetBestWeakClassifier(allFeatures, trainingSet);
                 trainingSet = UpdateWeights(trainingSet, bestWeakClassifier);
+
+                result.Add(bestWeakClassifier);
             }
 
             return new AdaBoost(result);

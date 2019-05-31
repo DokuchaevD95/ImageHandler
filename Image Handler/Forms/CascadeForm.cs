@@ -22,6 +22,7 @@ namespace ImageHandler.Forms
         public CascadeForm()
         {
             InitializeComponent();
+            pictureBox1.SizeMode = PictureBoxSizeMode.Zoom;
         }
 
         public void RunProgressBar()

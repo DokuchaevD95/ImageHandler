@@ -183,7 +183,7 @@
     </BootstrapperPackage>
   </ItemGroup>
   <ItemGroup>
-    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\custom_feature_1.txt">
+    <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_21.txt">
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
     <Content Include="Algorithms\AdaBoost\HaarFeatureTemplates\feature_1.txt">
@@ -247,10 +247,6 @@
       <CopyToOutputDirectory>Always</CopyToOutputDirectory>
     </Content>
   </ItemGroup>
-  <ItemGroup>
-    <Folder Include="Algorithms\Networks\BackProp\" />
-    <Folder Include="Algorithms\Networks\QuickProp\" />
-    <Folder Include="Algorithms\Networks\RProp\" />
-  </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>
