@@ -13,6 +13,7 @@ using System.Windows.Forms;
 
 namespace ImageHandler.Forms
 {
+    using ImageHandler.Utils;
     using ImageHandler.Algorithms.AdaBoost;
 
     public partial class CascadeForm : Form
@@ -69,14 +70,9 @@ namespace ImageHandler.Forms
                         watch.Stop();
                         StopProgressBar();
 
-                        if (recognitionResult)
-                            label1.Text = "Объект присутствует";
-                        else label1.Text = "Объект отсутствует";
-
-                        /*
                         TimeSpan span = watch.Elapsed;
-                        label1.Text = $"Процесс поиска занял: {span.Hours}:{span.Minutes}:{span.Seconds}";
-                        */
+                        label1.Text = recognitionResult ? "Лицо найдено\n" : "Лицо не обнаружено\n";
+                        label1.Text += $"Обработка заняла: {span.TotalMilliseconds}";
 
                         pictureBox1.Image = loadedImage;
                     }
@@ -137,6 +133,57 @@ namespace ImageHandler.Forms
                     }
                 }
             }
+        }
+
+        private async void button1_Click(object sender, EventArgs e)
+        {
+            List<Bitmap> trueSet = TestImageSet.GetTrueSet(AdaBoost.trainingImageSize);
+            List<Bitmap> falseSet = TestImageSet.GetFalseSet(AdaBoost.trainingImageSize);
+
+            int falseNegative = 0, falsePositive = 0;
+            double avrTreatTime = 0;
+
+            // true объекты
+            foreach (Bitmap img in trueSet)
+            {
+                Stopwatch watch = new Stopwatch();
+
+                watch.Start();
+                bool recognitionResult = await Task.Run(() => classifier.Recognize(img));
+                watch.Stop();
+
+                TimeSpan span = watch.Elapsed;
+                avrTreatTime += span.TotalMilliseconds;
+
+                if (!recognitionResult)
+                    falseNegative++;
+
+            }
+
+            // false объекты
+            foreach (Bitmap img in falseSet)
+            {
+                Stopwatch watch = new Stopwatch();
+
+                watch.Start();
+                bool recognitionResult = await Task.Run(() => classifier.Recognize(img));
+                watch.Stop();
+
+                TimeSpan span = watch.Elapsed;
+                avrTreatTime += span.TotalMilliseconds;
+
+                if (recognitionResult)
+                    falsePositive++;
+            }
+
+            avrTreatTime /= trueSet.Count + falseSet.Count;
+            int trueRecognizedAmount = TestImageSet.Count - falseNegative - falsePositive;
+            double trueRecognizedPercents = (100.0 / TestImageSet.Count) * trueRecognizedAmount;
+
+            label1.Text = $"Сред. аремя обр. изобр. {avrTreatTime:f4}\n" +
+                $"Число ЛН срабатываний {falseNegative}\n" +
+                $"Число ЛП срабатываний {falsePositive}\n" +
+                $"Число верно распозн. {trueRecognizedPercents:f4}";
         }
     }
 }

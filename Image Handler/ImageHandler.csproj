@@ -129,6 +129,7 @@
     <Compile Include="Program.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
     <Compile Include="Utils\ScanningWindow.cs" />
+    <Compile Include="Utils\TestImageSet.cs" />
     <Compile Include="Utils\TrainingImagesSet.cs" />
     <EmbeddedResource Include="Forms\AdaBoostForm.resx">
       <DependentUpon>AdaBoostForm.cs</DependentUpon>

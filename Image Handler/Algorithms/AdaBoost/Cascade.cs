@@ -40,7 +40,7 @@ namespace ImageHandler.Algorithms.AdaBoost
     [JsonObject(MemberSerialization.OptIn)]
     class Cascade
     {
-        private static readonly int trainingImageSize = Convert.ToInt32(ConfigurationManager.AppSettings["AdaBoostTrainingImageSize"]);
+        public static readonly int trainingImageSize = Convert.ToInt32(ConfigurationManager.AppSettings["AdaBoostTrainingImageSize"]);
         private static readonly string dumpSubDirectory = ConfigurationManager.AppSettings["DumpSubDirectory"];
 
         [JsonProperty]

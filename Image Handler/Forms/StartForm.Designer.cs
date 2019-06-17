@@ -45,9 +45,9 @@
             // 
             // button2
             // 
-            this.button2.Location = new System.Drawing.Point(12, 147);
+            this.button2.Location = new System.Drawing.Point(12, 98);
             this.button2.Name = "button2";
-            this.button2.Size = new System.Drawing.Size(113, 69);
+            this.button2.Size = new System.Drawing.Size(284, 69);
             this.button2.TabIndex = 1;
             this.button2.Text = "Нескоько примеров обучающей выборки";
             this.button2.UseVisualStyleBackColor = true;
@@ -55,7 +55,7 @@
             // 
             // Cascade
             // 
-            this.Cascade.Location = new System.Drawing.Point(12, 68);
+            this.Cascade.Location = new System.Drawing.Point(171, 12);
             this.Cascade.Name = "Cascade";
             this.Cascade.Size = new System.Drawing.Size(125, 49);
             this.Cascade.TabIndex = 2;
@@ -67,7 +67,7 @@
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
-            this.ClientSize = new System.Drawing.Size(391, 228);
+            this.ClientSize = new System.Drawing.Size(308, 179);
             this.Controls.Add(this.Cascade);
             this.Controls.Add(this.button2);
             this.Controls.Add(this.AdaBoost);
